@@ -210,6 +210,7 @@ class BackgroundManager {
         const response = await chrome.tabs.sendMessage(tabId, { action: 'syncGPTs' });
         if (response && response.success) {
           await chrome.storage.local.set({ lastAutoSync: now });
+          await this.recordSync();
           
           // Notification si activée
           if (settings.notifications) {
@@ -269,13 +270,14 @@ class BackgroundManager {
         });
 
         const response = await chrome.tabs.sendMessage(tabs[0].id, { action: 'syncGPTs' });
-        
+
         if (response && response.success) {
           this.showNotification('manual-sync', {
             title: 'Synchronisation réussie',
             message: `${response.gpts?.length || 0} GPTs synchronisés`,
             iconUrl: 'icons/icon48.png'
           });
+          await this.recordSync();
         }
       } else {
         this.showNotification('sync-error', {
@@ -456,6 +458,16 @@ class BackgroundManager {
     };
 
     await chrome.storage.local.set({ stats: newStats });
+  }
+
+  async recordSync() {
+    const stats = await this.getStorageData('stats') || {};
+    const updated = {
+      ...stats,
+      totalSyncs: (stats.totalSyncs || 0) + 1,
+      lastSyncTime: Date.now()
+    };
+    await chrome.storage.local.set({ stats: updated });
   }
 
   getCategoryBreakdown(gpts) {

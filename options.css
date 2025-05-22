@@ -855,3 +855,28 @@ body {
     padding: 20px;
   }
 }
+
+.footer-credit {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 24px 0 0;
+}
+
+.manage-list {
+  margin-top: 20px;
+}
+
+.manage-list .item-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-light);
+  font-size: 14px;
+}
+
+.manage-list .item-row img {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+}
