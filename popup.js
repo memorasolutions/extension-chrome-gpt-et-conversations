@@ -2,6 +2,7 @@
 const AppState = {
   gpts: [],
   conversations: [],
+  categories: [],
   currentTab: 'gpts',
   searchQuery: '',
   filters: {
@@ -44,6 +45,10 @@ const Utils = {
       clearTimeout(timeout);
       timeout = setTimeout(later, wait);
     };
+  },
+
+  capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
   },
 
   // Affichage des notifications toast
@@ -246,14 +251,17 @@ const SyncManager = {
           </div>
         </div>
         <div class="item-description">${gpt.description}</div>
-        <div class="item-footer">
-          <div class="item-meta">
-            <span class="category-badge">${gpt.category}</span>
-            <span>${Utils.formatDate(gpt.lastUsed)}</span>
+          <div class="item-footer">
+            <div class="item-meta">
+              <span class="category-badge">${gpt.category}</span>
+              <span>${Utils.formatDate(gpt.lastUsed)}</span>
+            </div>
+            <select class="category-select">
+              ${AppState.categories.map(c => `<option value="${c}" ${gpt.category===c?'selected':''}>${Utils.capitalize(c)}</option>`).join('')}
+            </select>
           </div>
         </div>
-      </div>
-    `).join('');
+      `).join('');
 
     // Ajout des event listeners
     this.attachGPTEventListeners();
@@ -276,11 +284,11 @@ const SyncManager = {
       return;
     }
 
-    container.innerHTML = filteredConversations.map(conv => `
-      <div class="item-card" data-id="${conv.id}">
-        <div class="item-header">
-          <div class="item-title"><img class="item-icon" src="icons/icon16.png" alt="">${conv.title}</div>
-          <div class="item-actions">
+      container.innerHTML = filteredConversations.map(conv => `
+        <div class="item-card" data-id="${conv.id}">
+          <div class="item-header">
+            <div class="item-title"><img class="item-icon" src="icons/icon16.png" alt="">${conv.title}</div>
+            <div class="item-actions">
             <button class="item-btn star-btn ${conv.starred ? 'active' : ''}" title="Marquer avec une étoile">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="${conv.starred ? 'currentColor' : 'none'}" stroke="currentColor">
                 <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
@@ -293,17 +301,20 @@ const SyncManager = {
                 <line x1="10" y1="14" x2="21" y2="3"/>
               </svg>
             </button>
+            </div>
+          </div>
+          <div class="item-description">${conv.lastMessage}</div>
+          <div class="item-footer">
+            <div class="item-meta">
+              <span>${conv.messageCount} messages</span>
+              <span>${Utils.formatDate(conv.updatedAt)}</span>
+            </div>
+            <select class="category-select">
+              ${AppState.categories.map(c => `<option value="${c}" ${conv.category===c?'selected':''}>${Utils.capitalize(c)}</option>`).join('')}
+            </select>
           </div>
         </div>
-        <div class="item-description">${conv.lastMessage}</div>
-        <div class="item-footer">
-          <div class="item-meta">
-            <span>${conv.messageCount} messages</span>
-            <span>${Utils.formatDate(conv.updatedAt)}</span>
-          </div>
-        </div>
-      </div>
-    `).join('');
+      `).join('');
 
     this.attachConversationEventListeners();
   },
@@ -415,8 +426,8 @@ const SyncManager = {
     });
 
     // Suppression
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
         e.stopPropagation();
         
         if (confirm('Êtes-vous sûr de vouloir supprimer ce GPT ?')) {
@@ -427,9 +438,22 @@ const SyncManager = {
           this.renderGPTs();
           Utils.showToast('GPT supprimé');
         }
+        });
       });
-    });
-  },
+
+      // Changer catégorie
+      document.querySelectorAll('.item-card .category-select').forEach(sel => {
+        sel.addEventListener('change', async (e) => {
+          const card = sel.closest('.item-card');
+          const gptId = card.dataset.id;
+          const gpt = AppState.gpts.find(g => g.id === gptId);
+          if (gpt) {
+            gpt.category = sel.value;
+            await Storage.set('gpts', AppState.gpts);
+          }
+        });
+      });
+    },
 
   attachConversationEventListeners() {
     // Étoiler
@@ -455,9 +479,22 @@ const SyncManager = {
         const card = btn.closest('.item-card');
         const convId = card.dataset.id;
         const conv = AppState.conversations.find(c => c.id === convId);
-        
+
         if (conv && conv.url) {
           chrome.tabs.create({ url: conv.url });
+        }
+      });
+    });
+
+    // Changer catégorie
+    document.querySelectorAll('.item-card .category-select').forEach(sel => {
+      sel.addEventListener('change', async () => {
+        const card = sel.closest('.item-card');
+        const convId = card.dataset.id;
+        const conv = AppState.conversations.find(c => c.id === convId);
+        if (conv) {
+          conv.category = sel.value;
+          await Storage.set('conversations', AppState.conversations);
         }
       });
     });
@@ -491,6 +528,7 @@ const SyncManager = {
 // Gestionnaire de formulaires
 const FormManager = {
   init() {
+    this.populateCategorySelects();
     this.setupAddGPTForm();
     this.setupAddConversationForm();
     this.setupImportExport();
@@ -550,6 +588,7 @@ const FormManager = {
       const title = document.getElementById('convTitle').value.trim();
       const url = document.getElementById('convUrl').value.trim();
       const lastMessage = document.getElementById('convLastMessage').value.trim();
+      const category = document.getElementById('convCategory').value;
 
       if (!title) {
         Utils.showToast('Le titre est requis', 'error');
@@ -561,6 +600,7 @@ const FormManager = {
         title,
         url,
         lastMessage,
+        category,
         starred: false,
         messageCount: 0,
         updatedAt: new Date().toISOString()
@@ -637,15 +677,22 @@ const FormManager = {
 
   setupAddSwitcher() {
     const buttons = document.querySelectorAll('.switch-btn');
-    buttons.forEach(btn => {
-      btn.addEventListener('click', () => {
-        buttons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const target = btn.dataset.target;
-        document.querySelectorAll('.add-section').forEach(sec => {
-          sec.classList.toggle('active', sec.id === target);
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          buttons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const target = btn.dataset.target;
+          document.querySelectorAll('.add-section').forEach(sec => {
+            sec.classList.toggle('active', sec.id === target);
+          });
         });
       });
+  },
+
+  populateCategorySelects() {
+    const options = AppState.categories.map(c => `<option value="${c}">${Utils.capitalize(c)}</option>`).join('');
+    document.querySelectorAll('#gptCategory, #convCategory').forEach(sel => {
+      sel.innerHTML = options;
     });
   },
 
@@ -740,9 +787,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Chargement des données sauvegardées
   const savedGPTs = await Storage.get('gpts') || [];
   const savedConversations = await Storage.get('conversations') || [];
-  
+  const settings = await Storage.get('settings') || {};
+
   AppState.gpts = savedGPTs;
-  AppState.conversations = savedConversations;
+  AppState.conversations = savedConversations.map(c => ({ category: 'other', ...c }));
+  AppState.categories = settings.categories || [];
 
   // Initialisation des gestionnaires
   ThemeManager.init();

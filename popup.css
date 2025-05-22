@@ -298,6 +298,12 @@ body {
   overflow: visible;
 }
 
+.item-description:not(:empty) {
+  background: #fff;
+  padding: 4px;
+  border-radius: 4px;
+}
+
 .item-footer {
   display: flex;
   justify-content: space-between;
@@ -323,13 +329,13 @@ body {
   padding: 4px;
   border-radius: 4px;
   cursor: pointer;
-  color: var(--text-secondary);
+  color: #000;
   transition: var(--transition);
-  opacity: 0;
+  opacity: 1;
 }
 
-.item-card:hover .item-btn {
-  opacity: 1;
+.item-btn svg {
+  stroke: #000;
 }
 
 .item-btn:hover {
