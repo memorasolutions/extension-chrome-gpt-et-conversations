@@ -57,6 +57,18 @@
                     </svg>
                     Données
                 </a></li>
+                <li><a href="#gpts" class="nav-link" data-section="gpts">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    GPTs
+                </a></li>
+                <li><a href="#convs" class="nav-link" data-section="convs">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M21 15A2 2 0 0 1 19 17H7L4 20V5A2 2 0 0 1 6 3H19A2 2 0 0 1 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Conversations
+                </a></li>
                 <li><a href="#stats" class="nav-link" data-section="stats">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <path d="M3 3V21H21M7 14L12 9L16 13L21 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -311,6 +323,24 @@
                 </div>
             </section>
 
+            <!-- Section GPTs -->
+            <section id="gpts" class="section">
+                <div class="section-header">
+                    <h2>Mes GPTs</h2>
+                    <p>Liste de vos GPTs synchronisés</p>
+                </div>
+                <div class="manage-list" id="optionsGptList"></div>
+            </section>
+
+            <!-- Section Conversations -->
+            <section id="convs" class="section">
+                <div class="section-header">
+                    <h2>Conversations</h2>
+                    <p>Historique synchronisé</p>
+                </div>
+                <div class="manage-list" id="optionsConvList"></div>
+            </section>
+
             <!-- Section Statistiques -->
             <section id="stats" class="section">
                 <div class="section-header">
@@ -443,6 +473,7 @@
             </section>
         </main>
     </div>
+    <div class="footer-credit">Créé avec ❤️ par <a href="https://memora.solutions" target="_blank">MEMORA Solutions</a></div>
 
     <!-- Toast Container -->
     <div id="toastContainer" class="toast-container"></div>

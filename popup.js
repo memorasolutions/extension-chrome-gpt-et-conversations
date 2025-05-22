@@ -174,6 +174,15 @@ const SyncManager = {
     }
   },
 
+  async updateSyncStats() {
+    const stats = await Storage.get('stats') || {};
+    stats.totalSyncs = (stats.totalSyncs || 0) + 1;
+    stats.totalGPTs = AppState.gpts.length;
+    stats.totalConversations = AppState.conversations.length;
+    stats.lastSyncTime = Date.now();
+    await Storage.set('stats', stats);
+  },
+
   renderGPTs() {
     const container = document.getElementById('gptsList');
     const filteredGPTs = this.filterAndSortGPTs();
@@ -193,9 +202,9 @@ const SyncManager = {
     }
 
     container.innerHTML = filteredGPTs.map(gpt => `
-      <div class="item-card fade-in" data-id="${gpt.id}">
+      <div class="item-card" data-id="${gpt.id}">
         <div class="item-header">
-          <div class="item-title">${gpt.name}</div>
+          <div class="item-title"><img class="item-icon" src="icons/icon16.png" alt="">${gpt.name}</div>
           <div class="item-actions">
             <button class="item-btn favorite-btn ${gpt.favorite ? 'active' : ''}" title="Marquer comme favori">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="${gpt.favorite ? 'currentColor' : 'none'}" stroke="currentColor">
@@ -248,9 +257,9 @@ const SyncManager = {
     }
 
     container.innerHTML = filteredConversations.map(conv => `
-      <div class="item-card fade-in" data-id="${conv.id}">
+      <div class="item-card" data-id="${conv.id}">
         <div class="item-header">
-          <div class="item-title">${conv.title}</div>
+          <div class="item-title"><img class="item-icon" src="icons/icon16.png" alt="">${conv.title}</div>
           <div class="item-actions">
             <button class="item-btn star-btn ${conv.starred ? 'active' : ''}" title="Marquer avec une étoile">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="${conv.starred ? 'currentColor' : 'none'}" stroke="currentColor">
@@ -538,8 +547,13 @@ const FormManager = {
   },
 
   updateStats() {
-    document.getElementById('gptCount').textContent = `${AppState.gpts.length} GPTs`;
-    document.getElementById('conversationCount').textContent = `${AppState.conversations.length} conversations`;
+    Storage.get('stats').then(stats => {
+      document.getElementById('gptCount').textContent = `${stats?.totalGPTs ?? AppState.gpts.length} GPTs`;
+      document.getElementById('conversationCount').textContent = `${stats?.totalConversations ?? AppState.conversations.length} conversations`;
+      if (stats && stats.lastSyncTime) {
+        document.getElementById('lastSync').textContent = Utils.formatDate(stats.lastSyncTime);
+      }
+    });
   }
 };
 
@@ -635,6 +649,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('syncBtn').addEventListener('click', async () => {
     await SyncManager.syncGPTs();
     await SyncManager.syncConversations();
+    await SyncManager.updateSyncStats();
+    FormManager.updateStats();
   });
 
   document.getElementById('settingsBtn').addEventListener('click', () => {
@@ -654,7 +670,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     if (tabs.length > 0) {
       setTimeout(() => {
-        SyncManager.syncGPTs();
+        SyncManager.syncGPTs().then(() => {
+          SyncManager.updateSyncStats();
+          FormManager.updateStats();
+        });
       }, 1000);
     }
   } catch (error) {

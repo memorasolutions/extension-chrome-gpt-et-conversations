@@ -25,6 +25,8 @@ class OptionsManager {
     this.updateDataSummary();
     this.updateStats();
     this.loadCategories();
+    this.renderGptList();
+    this.renderConvList();
     
     // Mise à jour de la version
     this.updateVersion();
@@ -237,12 +239,16 @@ class OptionsManager {
     document.documentElement.setAttribute('data-theme', theme);
   }
 
-  async updateSyncStatus() {
-    const lastSync = await this.getStorageData('lastAutoSync');
+  async updateSyncStatus(syncing = false) {
+    const stats = await this.getStorageData('stats') || {};
+    const lastSync = stats.lastSyncTime;
     const lastSyncElement = document.getElementById('lastSyncTime');
     const statusElement = document.getElementById('syncStatus');
 
-    if (lastSync) {
+    if (syncing) {
+      statusElement.textContent = 'En cours...';
+      statusElement.className = 'status-value status-active';
+    } else if (lastSync) {
       const date = new Date(lastSync);
       lastSyncElement.textContent = this.formatDate(date);
       statusElement.textContent = 'Actif';
@@ -257,6 +263,8 @@ class OptionsManager {
   async performManualSync() {
     const syncBtn = document.getElementById('syncNow');
     const originalText = syncBtn.innerHTML;
+
+    this.updateSyncStatus(true);
     
     syncBtn.innerHTML = `
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="animate-spin">
@@ -286,19 +294,30 @@ class OptionsManager {
       
       if (response && response.success) {
         await this.loadData();
+        const stats = await chrome.storage.local.get('stats');
+        const newStats = {
+          ...(stats.stats || {}),
+          totalSyncs: (stats.stats?.totalSyncs || 0) + 1,
+          totalGPTs: this.data.gpts.length,
+          totalConversations: this.data.conversations.length,
+          lastSyncTime: Date.now()
+        };
+        await chrome.storage.local.set({ stats: newStats });
+        this.data.stats = newStats;
         this.updateDataSummary();
         this.updateSyncStatus();
+        this.updateStats();
         this.showToast(`${response.gpts?.length || 0} GPTs synchronisés`, 'success');
       } else {
         throw new Error('Échec de la synchronisation');
       }
-    } catch (error) {
-      console.error('Erreur sync manuel:', error);
-      this.showToast(error.message, 'error');
-    } finally {
-      syncBtn.innerHTML = originalText;
-      syncBtn.disabled = false;
-    }
+  } catch (error) {
+    console.error('Erreur sync manuel:', error);
+    this.showToast(error.message, 'error');
+  } finally {
+    syncBtn.innerHTML = originalText;
+    syncBtn.disabled = false;
+    this.updateSyncStatus();
   }
 
   async resetSyncData() {
@@ -510,7 +529,9 @@ class OptionsManager {
           this.updateDataSummary();
           this.updateStats();
           this.loadCategories();
-          
+          this.renderGptList();
+          this.renderConvList();
+
           this.showToast('Données importées avec succès', 'success');
         }
       } catch (error) {
@@ -547,12 +568,14 @@ class OptionsManager {
       
       this.updateDataSummary();
       this.loadCategories();
+      this.renderGptList();
+      this.renderConvList();
       
       const removedGPTs = originalGPTsCount - uniqueGPTs.length;
       const removedConvs = originalConvsCount - uniqueConvs.length;
       
       this.showToast(
-        `${removedGPTs} GPTs et ${removedConvs} conversations dupliqués supprimés`, 
+        `${removedGPTs} GPTs et ${removedConvs} conversations dupliqués supprimés`,
         'success'
       );
     } else {
@@ -574,6 +597,7 @@ class OptionsManager {
         await chrome.storage.local.set({ conversations: recentConversations });
         this.data.conversations = recentConversations;
         this.updateDataSummary();
+        this.renderConvList();
         this.showToast(`${removedCount} anciennes conversations supprimées`, 'success');
       } else {
         this.showToast('Aucune ancienne donnée à supprimer', 'success');
@@ -596,7 +620,9 @@ class OptionsManager {
         this.updateDataSummary();
         this.updateStats();
         this.loadCategories();
-        
+        this.renderGptList();
+        this.renderConvList();
+
         this.showToast('Toutes les données ont été supprimées', 'success');
       }
     }
@@ -656,6 +682,22 @@ class OptionsManager {
         canvas.height - 10
       );
     });
+  }
+
+  renderGptList() {
+    const container = document.getElementById('optionsGptList');
+    if (!container) return;
+    container.innerHTML = this.data.gpts.map(gpt => `
+      <div class="item-row"><img src="icons/icon16.png" alt="">${gpt.name}</div>
+    `).join('');
+  }
+
+  renderConvList() {
+    const container = document.getElementById('optionsConvList');
+    if (!container) return;
+    container.innerHTML = this.data.conversations.map(conv => `
+      <div class="item-row"><img src="icons/icon16.png" alt="">${conv.title}</div>
+    `).join('');
   }
 
   updateVersion() {
