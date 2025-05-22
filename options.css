@@ -318,7 +318,7 @@ input[type="color"].setting-input {
 }
 
 .toggle input:checked + .toggle-slider {
-  background-color: var(--primary-color);
+  background-color: #2196F3;
 }
 
 .toggle input:checked + .toggle-slider:before {

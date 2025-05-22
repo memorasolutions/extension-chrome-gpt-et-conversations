@@ -414,17 +414,18 @@ class ChatGPTScraper {
       const urlMatch = link.match(/\/c\/([^/?]+)/);
       const conversationId = urlMatch ? urlMatch[1] : this.generateId();
 
-      return {
-        id: conversationId,
-        title: this.cleanText(title),
-        lastMessage: this.cleanText(lastMessage),
-        url: link,
-        messageCount: this.estimateMessageCount(element),
-        starred: this.isConversationStarred(element),
-        updatedAt: new Date().toISOString(),
-        createdAt: new Date().toISOString(),
-        source: 'chatgpt-sync'
-      };
+        return {
+          id: conversationId,
+          title: this.cleanText(title),
+          lastMessage: this.cleanText(lastMessage),
+          url: link,
+          messageCount: this.estimateMessageCount(element),
+          starred: this.isConversationStarred(element),
+          category: 'other',
+          updatedAt: new Date().toISOString(),
+          createdAt: new Date().toISOString(),
+          source: 'chatgpt-sync'
+        };
     } catch (error) {
       console.error('Erreur parsing conversation:', error);
       return null;
