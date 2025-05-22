@@ -192,8 +192,15 @@ const SyncManager = {
   },
 
   editGPT(id) {
-    const url = chrome.runtime.getURL(`options.html?edit=${id}`);
-    chrome.tabs.create({ url });
+    const gpt = AppState.gpts.find(g => g.id === id);
+    let base = 'https://chatgpt.com';
+    if (gpt && gpt.url) {
+      try {
+        const u = new URL(gpt.url);
+        base = u.origin;
+      } catch (_) {}
+    }
+    chrome.tabs.create({ url: `${base}/gpts/editor/${id}` });
   },
 
   renderGPTs() {
@@ -451,6 +458,30 @@ const SyncManager = {
         
         if (conv && conv.url) {
           chrome.tabs.create({ url: conv.url });
+        }
+      });
+    });
+
+    // Renommer conversation par double-clic
+    document.querySelectorAll('.item-title').forEach(titleEl => {
+      titleEl.addEventListener('dblclick', async (e) => {
+        e.stopPropagation();
+        const card = titleEl.closest('.item-card');
+        const convId = card.dataset.id;
+        const conv = AppState.conversations.find(c => c.id === convId);
+        if (!conv) return;
+        const newTitle = prompt('Nouveau titre', conv.title);
+        if (newTitle && newTitle.trim() && newTitle !== conv.title) {
+          conv.title = newTitle.trim();
+          conv.updatedAt = new Date().toISOString();
+          await Storage.set('conversations', AppState.conversations);
+          this.renderConversations();
+          try {
+            const tabs = await chrome.tabs.query({ url: ['*://chat.openai.com/*', '*://chatgpt.com/*'] });
+            if (tabs[0]) {
+              chrome.tabs.sendMessage(tabs[0].id, { action: 'renameConversation', id: conv.id, title: conv.title });
+            }
+          } catch (_) {}
         }
       });
     });

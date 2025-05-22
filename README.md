@@ -12,3 +12,11 @@ This repository contains a minimal Chrome extension example for handling GPT con
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+## Running Tests
+
+To run the small Node.js test suite:
+
+```bash
+node tests/nameParsingTest.js
+```
