@@ -688,7 +688,7 @@ class OptionsManager {
     const container = document.getElementById('optionsGptList');
     if (!container) return;
     container.innerHTML = this.data.gpts.map(gpt => `
-      <div class="item-row"><img src="icons/icon16.png" alt="">${gpt.name}</div>
+      <div class="item-row"><img src="${gpt.iconUrl || 'icons/icon16.png'}" alt="">${gpt.name}</div>
     `).join('');
   }
 

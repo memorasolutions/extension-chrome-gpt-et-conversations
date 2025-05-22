@@ -204,7 +204,7 @@ const SyncManager = {
     container.innerHTML = filteredGPTs.map(gpt => `
       <div class="item-card" data-id="${gpt.id}">
         <div class="item-header">
-          <div class="item-title"><img class="item-icon" src="icons/icon16.png" alt="">${gpt.name}</div>
+          <div class="item-title"><img class="item-icon" src="${gpt.iconUrl || 'icons/icon16.png'}" alt="">${gpt.name}</div>
           <div class="item-actions">
             <button class="item-btn favorite-btn ${gpt.favorite ? 'active' : ''}" title="Marquer comme favori">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="${gpt.favorite ? 'currentColor' : 'none'}" stroke="currentColor">
@@ -452,6 +452,7 @@ const FormManager = {
         name: formData.get('gptName') || document.getElementById('gptName').value,
         description: formData.get('gptDescription') || document.getElementById('gptDescription').value,
         url: formData.get('gptUrl') || document.getElementById('gptUrl').value,
+        iconUrl: '',
         category: formData.get('gptCategory') || document.getElementById('gptCategory').value,
         favorite: false,
         usageCount: 0,
@@ -567,7 +568,8 @@ const NavigationManager = {
 
   setupTabNavigation() {
     document.querySelectorAll('.nav-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
+      tab.addEventListener('click', (e) => {
+        e.preventDefault();
         const tabId = tab.dataset.tab;
         this.switchTab(tabId);
       });
