@@ -1,6 +1,7 @@
 // Content Script pour ChatGPT Sync Manager
 // Ce script s'exécute dans le contexte de la page ChatGPT
 
+if (typeof window === 'undefined' || !window.ChatGPTScraper) {
 class ChatGPTScraper {
   constructor(autoInit = true) {
     this.isInitialized = false;
@@ -76,6 +77,11 @@ class ChatGPTScraper {
 
         case 'getCurrentUrl':
           sendResponse({ success: true, url: window.location.href });
+          break;
+
+        case 'renameConversation':
+          this.renameConversation(request.id, request.title);
+          sendResponse({ success: true });
           break;
 
         default:
@@ -276,7 +282,7 @@ class ChatGPTScraper {
 
     return text
       .replace(/\s+/g, ' ')
-      .replace(/[^\w\s\-.,!?()]/g, '')
+      .replace(/[^\p{L}\p{N}\s\-.,!?()]/gu, '')
       .trim()
       .substring(0, 200); // Limite la longueur
   }
@@ -460,6 +466,18 @@ class ChatGPTScraper {
     });
   }
 
+  renameConversation(id, newTitle) {
+    try {
+      const link = document.querySelector(`a[href*="/c/${id}"]`);
+      if (link) {
+        const titleEl = link.querySelector('span') || link;
+        titleEl.textContent = newTitle;
+      }
+    } catch (e) {
+      console.error('renameConversation error', e);
+    }
+  }
+
   generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
@@ -497,3 +515,5 @@ if (typeof window !== 'undefined' && (window.location.hostname.includes('openai.
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { ChatGPTScraper };
 }
+}
+

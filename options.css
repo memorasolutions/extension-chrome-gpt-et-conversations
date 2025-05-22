@@ -264,6 +264,14 @@ body {
   min-width: 160px;
 }
 
+input[type="color"].setting-input {
+  padding: 0;
+  height: 36px;
+  width: 52px;
+  min-width: 52px;
+  background: none;
+}
+
 .setting-input:focus {
   outline: none;
   border-color: var(--primary-color);
