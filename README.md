@@ -8,3 +8,7 @@ This repository contains a minimal Chrome extension example for handling GPT con
 2. Ensure the extension's service worker loads without errors.
 3. Use the keyboard shortcut or define your own in Chrome to trigger the command handler.
 
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
