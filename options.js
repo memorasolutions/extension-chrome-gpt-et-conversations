@@ -57,8 +57,10 @@ class OptionsManager {
       syncInterval: 5,
       syncGPTs: true,
       syncConversations: true,
+      primaryColor: '#10a37f',
+      backgroundColor: '#ffffff',
       categories: [
-        'writing', 'coding', 'analysis', 'creative', 
+        'writing', 'coding', 'analysis', 'creative',
         'business', 'education', 'other'
       ]
     };
@@ -137,6 +139,19 @@ class OptionsManager {
     const syncConversationsToggle = document.getElementById('syncConversations');
     syncConversationsToggle.addEventListener('change', (e) => {
       this.updateSetting('syncConversations', e.target.checked);
+    });
+
+    // Couleurs
+    const primaryColorInput = document.getElementById('primaryColor');
+    primaryColorInput.addEventListener('input', (e) => {
+      this.updateSetting('primaryColor', e.target.value);
+      this.applyColors();
+    });
+
+    const backgroundColorInput = document.getElementById('backgroundColor');
+    backgroundColorInput.addEventListener('input', (e) => {
+      this.updateSetting('backgroundColor', e.target.value);
+      this.applyColors();
     });
 
     // Raccourcis clavier
@@ -222,9 +237,12 @@ class OptionsManager {
     document.getElementById('syncInterval').value = this.settings.syncInterval || 5;
     document.getElementById('syncGPTs').checked = this.settings.syncGPTs !== false;
     document.getElementById('syncConversations').checked = this.settings.syncConversations !== false;
+    document.getElementById('primaryColor').value = this.settings.primaryColor || '#10a37f';
+    document.getElementById('backgroundColor').value = this.settings.backgroundColor || '#ffffff';
 
     // Application du thème
     this.applyTheme(this.settings.theme || 'light');
+    this.applyColors();
 
     // Mise à jour du statut de sync
     this.updateSyncStatus();
@@ -235,8 +253,13 @@ class OptionsManager {
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       theme = prefersDark ? 'dark' : 'light';
     }
-    
+
     document.documentElement.setAttribute('data-theme', theme);
+  }
+
+  applyColors() {
+    document.documentElement.style.setProperty('--primary-color', this.settings.primaryColor);
+    document.documentElement.style.setProperty('--background', this.settings.backgroundColor);
   }
 
   async updateSyncStatus(syncing = false) {
@@ -287,8 +310,9 @@ class OptionsManager {
         files: ['content.js']
       });
 
-      const response = await chrome.tabs.sendMessage(tabs[0].id, { action: 'syncGPTs' });
-      if (response && response.success) {
+      const gptRes = await chrome.tabs.sendMessage(tabs[0].id, { action: 'syncGPTs' });
+      const convRes = await chrome.tabs.sendMessage(tabs[0].id, { action: 'syncConversations' });
+      if (gptRes && gptRes.success && convRes && convRes.success) {
         await this.loadData();
         const stats = await chrome.storage.local.get('stats');
         const newStats = {
@@ -303,7 +327,7 @@ class OptionsManager {
         this.updateDataSummary();
         this.updateSyncStatus();
         this.updateStats();
-        this.showToast(`${response.gpts?.length || 0} GPTs synchronisés`, 'success');
+        this.showToast(`${gptRes.gpts?.length || 0} GPTs et ${convRes.conversations?.length || 0} conversations synchronisés`, 'success');
       } else {
         throw new Error('Échec de la synchronisation');
       }

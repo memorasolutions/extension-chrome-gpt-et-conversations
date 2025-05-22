@@ -50,6 +50,12 @@
                     </svg>
                     Catégories
                 </a></li>
+                <li><a href="#custom" class="nav-link" data-section="custom">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Personnalisation
+                </a></li>
                 <li><a href="#data" class="nav-link" data-section="data">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -266,6 +272,29 @@
                 </div>
             </section>
 
+            <!-- Section Personnalisation -->
+            <section id="custom" class="section">
+                <div class="section-header">
+                    <h2>Personnalisation</h2>
+                    <p>Choisissez les couleurs de l'interface</p>
+                </div>
+                <div class="settings-group">
+                    <h3>Couleurs</h3>
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <label for="primaryColor">Couleur principale</label>
+                        </div>
+                        <input type="color" id="primaryColor" class="setting-input">
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <label for="backgroundColor">Couleur de fond</label>
+                        </div>
+                        <input type="color" id="backgroundColor" class="setting-input">
+                    </div>
+                </div>
+            </section>
+
             <!-- Section Données -->
             <section id="data" class="section">
                 <div class="section-header">
@@ -473,7 +502,7 @@
             </section>
         </main>
     </div>
-    <div class="footer-credit">Créé avec ❤️ par <a href="https://memora.solutions" target="_blank">MEMORA Solutions</a></div>
+    <div class="footer-credit">Créé avec ❤️ au Canada 🇨🇦 par <a href="https://memora.solutions" target="_blank">MEMORA Solutions</a></div>
 
     <!-- Toast Container -->
     <div id="toastContainer" class="toast-container"></div>

@@ -22,7 +22,10 @@
                 <div class="header-actions">
                     <button id="syncBtn" class="sync-btn" title="Synchroniser">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                            <path d="M23 4V10H17M1 20V14H7M20.49 9A9 9 0 0 0 5.64 5.64L1 10M22.99 14A9 9 0 0 1 8.36 18.36L13 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <polyline points="23 4 23 10 17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <polyline points="1 20 1 14 7 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M3.51 9a9 9 0 0 1 15.36-3.36L23 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M20.49 15a9 9 0 0 1-15.36 3.36L1 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </button>
                     <button id="themeToggle" class="theme-toggle" title="Changer de thème">
@@ -115,7 +118,12 @@
 
             <!-- Add Tab -->
             <div id="add-tab" class="tab-pane">
-                <div class="add-section">
+                <div class="add-switcher">
+                    <button class="switch-btn active" data-target="gptSection">GPT</button>
+                    <button class="switch-btn" data-target="convSection">Conversation</button>
+                    <button class="switch-btn" data-target="actionsSection">Actions rapides</button>
+                </div>
+                <div id="gptSection" class="add-section active">
                     <h3>Ajouter un nouveau GPT</h3>
                     <form id="addGptForm" class="add-form">
                         <div class="form-group">
@@ -151,7 +159,7 @@
                     </form>
                 </div>
 
-                <div class="add-section">
+                <div id="actionsSection" class="add-section">
                     <h3>Actions rapides</h3>
                     <div class="quick-actions">
                         <button id="importBtn" class="action-btn">
@@ -169,7 +177,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="add-section">
+                <div id="convSection" class="add-section">
                     <h3>Ajouter une conversation</h3>
                     <form id="addConvForm" class="add-form">
                         <div class="form-group">
@@ -201,15 +209,8 @@
                 <span id="gptCount">0 GPTs</span>
                 <span id="conversationCount">0 conversations</span>
                 <span id="lastSync">--</span>
-            </div>
-            <button id="settingsBtn" class="settings-btn" title="Paramètres">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
-                    <path d="M19.4 15A1.65 1.65 0 0 0 19 14.54L20.5 13A1.65 1.65 0 0 0 21 11.82L19.66 9.18A1.65 1.65 0 0 0 18.3 8.82L16.8 10.36A1.65 1.65 0 0 0 15.46 10L15 8.5A1.65 1.65 0 0 0 13.82 7.5H10.18A1.65 1.65 0 0 0 9 8.5L8.54 10A1.65 1.65 0 0 0 7.2 10.36L5.7 8.82A1.65 1.65 0 0 0 4.34 9.18L3 11.82A1.65 1.65 0 0 0 3.5 13L5 14.54A1.65 1.65 0 0 0 4.6 15L4.5 16.5A1.65 1.65 0 0 0 5.82 17.5H8.18A1.65 1.65 0 0 0 9.5 16.5L10 15A1.65 1.65 0 0 0 10.36 13.8L11.82 15.3A1.65 1.65 0 0 0 13 15.5L14.54 14A1.65 1.65 0 0 0 15 13.46L16.5 15A1.65 1.65 0 0 0 17.5 15.5H19.18A1.65 1.65 0 0 0 20.5 14.18L19.4 15Z" stroke="currentColor" stroke-width="2"/>
-                </path>
-            </button>
-        </footer>
-        <div class="footer-credit">Créé avec ❤️ par <a href="https://memora.solutions" target="_blank">MEMORA Solutions</a></div>
+            </div>        </footer>
+        <div class="footer-credit">Créé avec ❤️ au Canada 🇨🇦 par <a href="https://memora.solutions" target="_blank">MEMORA Solutions</a></div>
     </div>
 
     <!-- Modal for item details -->
