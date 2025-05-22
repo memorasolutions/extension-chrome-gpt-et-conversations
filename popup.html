@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Sync Manager</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                    </svg>
+                    <h1>ChatGPT Sync</h1>
+                </div>
+                <div class="header-actions">
+                    <button id="syncBtn" class="sync-btn" title="Synchroniser">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <path d="M23 4V10H17M1 20V14H7M20.49 9A9 9 0 0 0 5.64 5.64L1 10M22.99 14A9 9 0 0 1 8.36 18.36L13 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <button id="themeToggle" class="theme-toggle" title="Changer de thème">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                            <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 1V3M12 21V23M4.22 4.22L5.64 5.64M18.36 18.36L19.78 19.78M1 12H3M21 12H23M4.22 19.78L5.64 18.36M18.36 5.64L19.78 4.22" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="gpts">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Mes GPTs
+            </button>
+            <button class="nav-tab" data-tab="conversations">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M21 15A2 2 0 0 1 19 17H7L4 20V5A2 2 0 0 1 6 3H19A2 2 0 0 1 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Conversations
+            </button>
+            <button class="nav-tab" data-tab="add">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Ajouter
+            </button>
+        </nav>
+
+        <!-- Search Bar -->
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Rechercher vos GPTs et conversations...">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- GPTs Tab -->
+            <div id="gpts-tab" class="tab-pane active">
+                <div class="filter-bar">
+                    <select id="categoryFilter">
+                        <option value="all">Toutes les catégories</option>
+                        <option value="favorites">Favoris</option>
+                        <option value="recent">Récents</option>
+                        <option value="writing">Écriture</option>
+                        <option value="coding">Programmation</option>
+                        <option value="analysis">Analyse</option>
+                        <option value="creative">Créatif</option>
+                    </select>
+                    <select id="sortFilter">
+                        <option value="name">Nom A-Z</option>
+                        <option value="recent">Plus récent</option>
+                        <option value="usage">Plus utilisé</option>
+                    </select>
+                </div>
+                <div id="gptsList" class="items-list">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p>Chargement de vos GPTs...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conversations Tab -->
+            <div id="conversations-tab" class="tab-pane">
+                <div class="filter-bar">
+                    <select id="conversationFilter">
+                        <option value="all">Toutes les conversations</option>
+                        <option value="today">Aujourd'hui</option>
+                        <option value="week">Cette semaine</option>
+                        <option value="month">Ce mois</option>
+                        <option value="starred">Étoilées</option>
+                    </select>
+                </div>
+                <div id="conversationsList" class="items-list">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                        <p>Chargement des conversations...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Tab -->
+            <div id="add-tab" class="tab-pane">
+                <div class="add-section">
+                    <h3>Ajouter un nouveau GPT</h3>
+                    <form id="addGptForm" class="add-form">
+                        <div class="form-group">
+                            <label for="gptName">Nom du GPT</label>
+                            <input type="text" id="gptName" placeholder="Ex: Assistant Marketing">
+                        </div>
+                        <div class="form-group">
+                            <label for="gptDescription">Description</label>
+                            <textarea id="gptDescription" placeholder="Description courte du GPT..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="gptUrl">URL ChatGPT</label>
+                            <input type="url" id="gptUrl" placeholder="https://chat.openai.com/g/...">
+                        </div>
+                        <div class="form-group">
+                            <label for="gptCategory">Catégorie</label>
+                            <select id="gptCategory">
+                                <option value="writing">Écriture</option>
+                                <option value="coding">Programmation</option>
+                                <option value="analysis">Analyse</option>
+                                <option value="creative">Créatif</option>
+                                <option value="business">Business</option>
+                                <option value="education">Éducation</option>
+                                <option value="other">Autre</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="add-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Ajouter le GPT
+                        </button>
+                    </form>
+                </div>
+
+                <div class="add-section">
+                    <h3>Actions rapides</h3>
+                    <div class="quick-actions">
+                        <button id="importBtn" class="action-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Importer des données
+                        </button>
+                        <button id="exportBtn" class="action-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M21 15V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V15M7 10L12 15L17 10M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Exporter mes données
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="stats">
+                <span id="gptCount">0 GPTs</span>
+                <span id="conversationCount">0 conversations</span>
+            </div>
+            <button id="settingsBtn" class="settings-btn" title="Paramètres">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                    <path d="M19.4 15A1.65 1.65 0 0 0 19 14.54L20.5 13A1.65 1.65 0 0 0 21 11.82L19.66 9.18A1.65 1.65 0 0 0 18.3 8.82L16.8 10.36A1.65 1.65 0 0 0 15.46 10L15 8.5A1.65 1.65 0 0 0 13.82 7.5H10.18A1.65 1.65 0 0 0 9 8.5L8.54 10A1.65 1.65 0 0 0 7.2 10.36L5.7 8.82A1.65 1.65 0 0 0 4.34 9.18L3 11.82A1.65 1.65 0 0 0 3.5 13L5 14.54A1.65 1.65 0 0 0 4.6 15L4.5 16.5A1.65 1.65 0 0 0 5.82 17.5H8.18A1.65 1.65 0 0 0 9.5 16.5L10 15A1.65 1.65 0 0 0 10.36 13.8L11.82 15.3A1.65 1.65 0 0 0 13 15.5L14.54 14A1.65 1.65 0 0 0 15 13.46L16.5 15A1.65 1.65 0 0 0 17.5 15.5H19.18A1.65 1.65 0 0 0 20.5 14.18L19.4 15Z" stroke="currentColor" stroke-width="2"/>
+                </path>
+            </button>
+        </footer>
+    </div>
+
+    <!-- Modal for item details -->
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be dynamically added -->
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

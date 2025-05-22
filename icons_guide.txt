@@ -1,0 +1,126 @@
+# Guide pour créer les icônes de l'extension ChatGPT Sync Manager
+
+## Icônes requises
+
+Vous devez créer 4 tailles d'icônes :
+- icon16.png (16x16 pixels)
+- icon32.png (32x32 pixels) 
+- icon48.png (48x48 pixels)
+- icon128.png (128x128 pixels)
+
+## Design suggéré
+
+### Concept visuel
+L'icône doit représenter la synchronisation et ChatGPT avec un style moderne :
+
+1. **Élément principal** : Symbole de synchronisation (flèches circulaires)
+2. **Couleur principale** : #10a37f (vert ChatGPT)
+3. **Style** : Moderne, minimaliste, avec des coins arrondis
+4. **Background** : Transparent ou dégradé subtil
+
+### Option 1 : Icône SVG simple
+Vous pouvez créer cette icône SVG et la convertir aux différentes tailles :
+
+```svg
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="64" cy="64" r="56" fill="#10a37f" opacity="0.1"/>
+  <circle cx="64" cy="64" r="48" fill="#10a37f"/>
+  
+  <!-- Sync arrows -->
+  <path d="M64 24 L84 44 L74 44 L74 54 L54 54 L54 44 L44 44 Z" fill="white"/>
+  <path d="M64 104 L44 84 L54 84 L54 74 L74 74 L74 84 L84 84 Z" fill="white"/>
+  
+  <!-- Side arrows -->
+  <path d="M24 64 L44 44 L44 54 L54 54 L54 74 L44 74 L44 84 Z" fill="white" opacity="0.8"/>
+  <path d="M104 64 L84 84 L84 74 L74 74 L74 54 L84 54 L84 44 Z" fill="white" opacity="0.8"/>
+</svg>
+```
+
+### Option 2 : Icône avec ChatGPT + Sync
+- Logo ChatGPT stylisé (cercle avec "G")
+- Flèches de synchronisation autour
+- Dégradé vert moderne
+
+## Outils recommandés
+
+### Gratuits
+1. **GIMP** - Éditeur d'images gratuit
+2. **Inkscape** - Éditeur SVG gratuit
+3. **Canva** - Design en ligne
+4. **Figma** - Design d'interface (gratuit)
+
+### Payants
+1. **Adobe Illustrator** - Création vectorielle
+2. **Adobe Photoshop** - Édition d'images
+3. **Sketch** - Design d'interface (Mac)
+
+## Création étape par étape
+
+### 1. Créer l'icône de base (128x128)
+- Ouvrez votre outil de design
+- Créez un nouveau document 128x128 pixels
+- Utilisez la couleur #10a37f comme base
+- Ajoutez les éléments de synchronisation
+- Gardez le design simple et lisible
+
+### 2. Exporter aux différentes tailles
+- Exportez en PNG avec transparence
+- Créez les 4 tailles requises
+- Vérifiez que l'icône reste lisible à 16x16
+
+### 3. Tester les icônes
+- Placez les fichiers dans le dossier `icons/`
+- Rechargez l'extension dans Chrome
+- Vérifiez l'apparence dans la barre d'outils
+
+## Conseils de design
+
+### Lisibilité
+- L'icône doit être claire même à 16x16 pixels
+- Évitez les détails trop fins
+- Utilisez des contrastes élevés
+
+### Cohérence
+- Respectez le style moderne de l'extension
+- Utilisez la palette de couleurs définie
+- Gardez la simplicité
+
+### Accessibilité
+- Assurez-vous que l'icône est distinguable
+- Testez avec différents arrière-plans
+- Vérifiez en niveaux de gris
+
+## Alternative : Utiliser une police d'icônes
+
+Si vous préférez une solution plus simple, vous pouvez utiliser une icône de police comme Material Icons ou Font Awesome :
+
+```html
+<!-- Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<i class="material-icons">sync</i>
+
+<!-- Font Awesome -->
+<i class="fas fa-sync-alt"></i>
+```
+
+Puis la convertir en image avec un outil de capture d'écran.
+
+## Validation finale
+
+Avant de finaliser :
+1. ✅ Toutes les tailles sont créées (16, 32, 48, 128)
+2. ✅ Format PNG avec transparence
+3. ✅ Couleurs cohérentes avec l'extension
+4. ✅ Lisible à toutes les tailles
+5. ✅ Style moderne et professionnel
+
+## Fichiers à créer
+
+Créez ces fichiers dans le dossier `icons/` :
+- `icon16.png`
+- `icon32.png`
+- `icon48.png`
+- `icon128.png`
+
+Une fois les icônes créées, votre extension sera complète et prête à être utilisée !

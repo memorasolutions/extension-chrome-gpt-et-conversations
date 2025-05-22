@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Sync Manager - Paramètres</title>
+    <link rel="stylesheet" href="options.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                    </svg>
+                    <div>
+                        <h1>ChatGPT Sync Manager</h1>
+                        <p>Paramètres et Configuration</p>
+                    </div>
+                </div>
+                <div class="version">
+                    Version <span id="version">1.0.0</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-sidebar">
+            <ul class="nav-list">
+                <li><a href="#general" class="nav-link active" data-section="general">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                        <path d="M19.4 15A1.65 1.65 0 0 0 19 14.54L20.5 13A1.65 1.65 0 0 0 21 11.82L19.66 9.18A1.65 1.65 0 0 0 18.3 8.82L16.8 10.36A1.65 1.65 0 0 0 15.46 10L15 8.5A1.65 1.65 0 0 0 13.82 7.5H10.18A1.65 1.65 0 0 0 9 8.5L8.54 10A1.65 1.65 0 0 0 7.2 10.36L5.7 8.82A1.65 1.65 0 0 0 4.34 9.18L3 11.82A1.65 1.65 0 0 0 3.5 13L5 14.54A1.65 1.65 0 0 0 4.6 15L4.5 16.5A1.65 1.65 0 0 0 5.82 17.5H8.18A1.65 1.65 0 0 0 9.5 16.5L10 15A1.65 1.65 0 0 0 10.36 13.8L11.82 15.3A1.65 1.65 0 0 0 13 15.5L14.54 14A1.65 1.65 0 0 0 15 13.46L16.5 15A1.65 1.65 0 0 0 17.5 15.5H19.18A1.65 1.65 0 0 0 20.5 14.18L19.4 15Z" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Général
+                </a></li>
+                <li><a href="#sync" class="nav-link" data-section="sync">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M23 4V10H17M1 20V14H7M20.49 9A9 9 0 0 0 5.64 5.64L1 10M22.99 14A9 9 0 0 1 8.36 18.36L13 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Synchronisation
+                </a></li>
+                <li><a href="#categories" class="nav-link" data-section="categories">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M4 4H20V6H4V4ZM4 8H20V10H4V8ZM4 12H20V14H4V12ZM4 16H20V18H4V16Z" fill="currentColor"/>
+                    </svg>
+                    Catégories
+                </a></li>
+                <li><a href="#data" class="nav-link" data-section="data">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Données
+                </a></li>
+                <li><a href="#stats" class="nav-link" data-section="stats">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M3 3V21H21M7 14L12 9L16 13L21 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Statistiques
+                </a></li>
+                <li><a href="#about" class="nav-link" data-section="about">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                        <path d="M9,9h0a3,3,0,0,1,6,0c0,2-3,3-3,3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    À propos
+                </a></li>
+            </ul>
+        </nav>
+
+        <!-- Content -->
+        <main class="main-content">
+            <!-- Section Général -->
+            <section id="general" class="section active">
+                <div class="section-header">
+                    <h2>Paramètres généraux</h2>
+                    <p>Configuration de base de l'extension</p>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Apparence</h3>
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <label for="theme">Thème</label>
+                            <span class="setting-description">Choisissez l'apparence de l'extension</span>
+                        </div>
+                        <select id="theme" class="setting-input">
+                            <option value="light">Clair</option>
+                            <option value="dark">Sombre</option>
+                            <option value="auto">Automatique</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <label for="language">Langue</label>
+                            <span class="setting-description">Langue de l'interface</span>
+                        </div>
+                        <select id="language" class="setting-input">
+                            <option value="fr">Français</option>
+                            <option value="en">English</option>
+                            <option value="es">Español</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Notifications</h3>
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <label for="notifications">Activer les notifications</label>
+                            <span class="setting-description">Recevoir des notifications lors des synchronisations</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="notifications">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <label for="soundNotifications">Notifications sonores</label>
+                            <span class="setting-description">Jouer un son lors des notifications</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="soundNotifications">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Raccourcis clavier</h3>
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <label>Synchronisation rapide</label>
+                            <span class="setting-description">Ctrl+Shift+S (configurable dans chrome://extensions/shortcuts)</span>
+                        </div>
+                        <button id="configureShortcuts" class="btn-secondary">Configurer</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Synchronisation -->
+            <section id="sync" class="section">
+                <div class="section-header">
+                    <h2>Synchronisation</h2>
+                    <p>Paramètres de synchronisation avec ChatGPT</p>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Synchronisation automatique</h3>
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <label for="autoSync">Synchronisation automatique</label>
+                            <span class="setting-description">Synchroniser automatiquement lors de l'ouverture de ChatGPT</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="autoSync">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <label for="syncInterval">Intervalle de synchronisation</label>
+                            <span class="setting-description">Temps minimum entre deux synchronisations automatiques</span>
+                        </div>
+                        <select id="syncInterval" class="setting-input">
+                            <option value="1">1 minute</option>
+                            <option value="5">5 minutes</option>
+                            <option value="10">10 minutes</option>
+                            <option value="30">30 minutes</option>
+                            <option value="60">1 heure</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Données à synchroniser</h3>
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <label for="syncGPTs">Synchroniser les GPTs</label>
+                            <span class="setting-description">Inclure les GPTs personnalisés dans la synchronisation</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="syncGPTs" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <div class="setting-label">
+                            <label for="syncConversations">Synchroniser les conversations</label>
+                            <span class="setting-description">Inclure l'historique des conversations</span>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="syncConversations" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Actions de synchronisation</h3>
+                    <div class="action-buttons">
+                        <button id="syncNow" class="btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M23 4V10H17M1 20V14H7M20.49 9A9 9 0 0 0 5.64 5.64L1 10M22.99 14A9 9 0 0 1 8.36 18.36L13 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Synchroniser maintenant
+                        </button>
+                        <button id="resetSync" class="btn-secondary">Réinitialiser les données de sync</button>
+                    </div>
+                </div>
+
+                <div class="sync-status">
+                    <h3>Statut de synchronisation</h3>
+                    <div class="status-info">
+                        <div class="status-item">
+                            <span class="status-label">Dernière synchronisation :</span>
+                            <span id="lastSyncTime" class="status-value">Jamais</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-label">Statut :</span>
+                            <span id="syncStatus" class="status-value status-inactive">Inactif</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Catégories -->
+            <section id="categories" class="section">
+                <div class="section-header">
+                    <h2>Gestion des catégories</h2>
+                    <p>Personnalisez les catégories de vos GPTs</p>
+                </div>
+
+                <div class="categories-manager">
+                    <div class="add-category">
+                        <input type="text" id="newCategoryName" placeholder="Nom de la nouvelle catégorie">
+                        <button id="addCategory" class="btn-primary">Ajouter</button>
+                    </div>
+
+                    <div class="categories-list" id="categoriesList">
+                        <!-- Les catégories seront ajoutées dynamiquement -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Données -->
+            <section id="data" class="section">
+                <div class="section-header">
+                    <h2>Gestion des données</h2>
+                    <p>Importez, exportez et gérez vos données</p>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Sauvegarde et restauration</h3>
+                    <div class="action-buttons">
+                        <button id="exportData" class="btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M21 15V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V15M7 10L12 15L17 10M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Exporter toutes les données
+                        </button>
+                        <button id="importData" class="btn-secondary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                <path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            Importer des données
+                        </button>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <h3>Nettoyage des données</h3>
+                    <div class="action-buttons">
+                        <button id="cleanDuplicates" class="btn-secondary">Supprimer les doublons</button>
+                        <button id="clearOldData" class="btn-secondary">Nettoyer les anciennes données</button>
+                        <button id="resetAllData" class="btn-danger">Réinitialiser toutes les données</button>
+                    </div>
+                </div>
+
+                <div class="data-summary">
+                    <h3>Résumé des données</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-number" id="totalGPTs">0</div>
+                            <div class="summary-label">GPTs</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-number" id="totalConversations">0</div>
+                            <div class="summary-label">Conversations</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-number" id="totalCategories">0</div>
+                            <div class="summary-label">Catégories</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-number" id="dataSize">0 KB</div>
+                            <div class="summary-label">Taille</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section Statistiques -->
+            <section id="stats" class="section">
+                <div class="section-header">
+                    <h2>Statistiques d'utilisation</h2>
+                    <p>Analysez votre utilisation de l'extension</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M23 4V10H17M1 20V14H7M20.49 9A9 9 0 0 0 5.64 5.64L1 10M22.99 14A9 9 0 0 1 8.36 18.36L13 14" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="totalSyncs">0</div>
+                            <div class="stat-label">Synchronisations totales</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                <polyline points="12,6 12,12 16,14" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="avgSyncTime">0s</div>
+                            <div class="stat-label">Temps moyen de sync</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16l4-2 4 2z" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="favoriteGPTs">0</div>
+                            <div class="stat-label">GPTs favoris</div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 11H15M9 15H15M17 21L20 18V7A2 2 0 0 0 18 5H6A2 2 0 0 0 4 7V18L7 21H17Z" stroke="currentColor" stroke-width="2"/>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <div class="stat-number" id="activeConversations">0</div>
+                            <div class="stat-label">Conversations actives</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-section">
+                    <div class="chart-container">
+                        <h3>Utilisation par catégorie</h3>
+                        <canvas id="categoryChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section À propos -->
+            <section id="about" class="section">
+                <div class="section-header">
+                    <h2>À propos</h2>
+                    <p>Informations sur l'extension ChatGPT Sync Manager</p>
+                </div>
+
+                <div class="about-content">
+                    <div class="about-section">
+                        <h3>Description</h3>
+                        <p>ChatGPT Sync Manager est une extension Chrome qui vous permet de synchroniser et gérer facilement vos GPTs personnalisés et vos conversations ChatGPT. Avec une interface moderne et intuitive, gardez tous vos outils IA organisés et accessibles.</p>
+                    </div>
+
+                    <div class="about-section">
+                        <h3>Fonctionnalités principales</h3>
+                        <ul>
+                            <li>Synchronisation automatique de vos GPTs</li>
+                            <li>Gestion des conversations ChatGPT</li>
+                            <li>Catégorisation intelligente</li>
+                            <li>Interface moderne avec thème sombre/clair</li>
+                            <li>Export/Import des données</li>
+                            <li>Statistiques d'utilisation détaillées</li>
+                        </ul>
+                    </div>
+
+                    <div class="about-section">
+                        <h3>Support et contributions</h3>
+                        <div class="links">
+                            <a href="#" class="link-button">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <path d="M9 19C4 20.5 4 16.5 2 16L9 19ZM22 16L15 19V13.5C15.5 13.5 16 13.26 16.26 12.74C16.5 12.5 17 12.5 17 11.5C17 10.5 16.5 10 16 10H15V7C15 5.5 13.5 4 12 4S9 5.5 9 7V10H8C7.5 10 7 10.5 7 11.5S7.5 12.5 8 12.74C8.26 13.26 8.5 13.5 9 13.5V19" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                GitHub
+                            </a>
+                            <a href="#" class="link-button">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M9,9h0a3,3,0,0,1,6,0c0,2-3,3-3,3" stroke="currentColor" stroke-width="2"/>
+                                    <line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" stroke-width="2"/>
+                                </svg>
+                                Support
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="about-section">
+                        <h3>Informations techniques</h3>
+                        <div class="tech-info">
+                            <div class="info-item">
+                                <span class="info-label">Version :</span>
+                                <span class="info-value" id="aboutVersion">1.0.0</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Plateforme :</span>
+                                <span class="info-value">Chrome Extension</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Dernière mise à jour :</span>
+                                <span class="info-value" id="lastUpdate">2025</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="options.js"></script>
+</body>
+</html>
