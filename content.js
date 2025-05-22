@@ -220,10 +220,24 @@ class ChatGPTScraper {
       // Catégorisation automatique basée sur le nom/description
       const category = this.categorizeGPT(name, description);
 
+      // Extraction de l'icône
+      let iconUrl = null;
+      const imgEl = element.querySelector('img');
+      if (imgEl && imgEl.src) {
+        iconUrl = imgEl.src;
+      } else {
+        const styleBg = getComputedStyle(element).backgroundImage;
+        const match = styleBg && styleBg !== 'none' ? styleBg.match(/url\("?(.*?)"?\)/) : null;
+        if (match && match[1]) {
+          iconUrl = match[1];
+        }
+      }
+
       return {
         id: gptId,
         name: name,
         description: description,
+        iconUrl: iconUrl,
         url: link,
         category: category,
         favorite: false,
