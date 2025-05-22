@@ -260,12 +260,12 @@ class OptionsManager {
     }
   }
 
+
   async performManualSync() {
     const syncBtn = document.getElementById('syncNow');
     const originalText = syncBtn.innerHTML;
 
     this.updateSyncStatus(true);
-    
     syncBtn.innerHTML = `
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" class="animate-spin">
         <path d="M23 4V10H17M1 20V14H7M20.49 9A9 9 0 0 0 5.64 5.64L1 10M22.99 14A9 9 0 0 1 8.36 18.36L13 14" stroke="currentColor" stroke-width="2"/>
@@ -275,23 +275,19 @@ class OptionsManager {
     syncBtn.disabled = true;
 
     try {
-      // Trouver l'onglet ChatGPT actif
-      const tabs = await chrome.tabs.query({ 
-        url: ['*://chat.openai.com/*', '*://chatgpt.com/*'] 
+      const tabs = await chrome.tabs.query({
+        url: ['*://chat.openai.com/*', '*://chatgpt.com/*']
       });
-
       if (tabs.length === 0) {
         throw new Error('Aucun onglet ChatGPT ouvert');
       }
 
-      // Injection du content script et synchronisation
       await chrome.scripting.executeScript({
         target: { tabId: tabs[0].id },
         files: ['content.js']
       });
 
       const response = await chrome.tabs.sendMessage(tabs[0].id, { action: 'syncGPTs' });
-      
       if (response && response.success) {
         await this.loadData();
         const stats = await chrome.storage.local.get('stats');
@@ -311,15 +307,15 @@ class OptionsManager {
       } else {
         throw new Error('Échec de la synchronisation');
       }
-  } catch (error) {
-    console.error('Erreur sync manuel:', error);
-    this.showToast(error.message, 'error');
-  } finally {
-    syncBtn.innerHTML = originalText;
-    syncBtn.disabled = false;
-    this.updateSyncStatus();
+    } catch (error) {
+      console.error('Erreur sync manuel:', error);
+      this.showToast(error.message, 'error');
+    } finally {
+      syncBtn.innerHTML = originalText;
+      syncBtn.disabled = false;
+      this.updateSyncStatus();
+    }
   }
-
   async resetSyncData() {
     if (confirm('Êtes-vous sûr de vouloir réinitialiser les données de synchronisation ?')) {
       await chrome.storage.local.remove(['lastAutoSync', 'lastSyncTime']);
@@ -460,10 +456,28 @@ class OptionsManager {
       `Nouveau nom pour "${this.getCategoryDisplayName(category)}" :`,
       this.getCategoryDisplayName(category)
     );
-    
+
     if (newName && newName.trim()) {
-      // Implémentation de la modification de catégorie
-      this.showToast('Fonctionnalité en développement', 'warning');
+      const newId = newName.toLowerCase().replace(/\s+/g, '-');
+      if (this.settings.categories.includes(newId)) {
+        this.showToast('Cette catégorie existe déjà', 'warning');
+        return;
+      }
+
+      const categories = this.settings.categories.map(cat =>
+        cat === category ? newId : cat
+      );
+      const updatedGPTs = this.data.gpts.map(gpt =>
+        gpt.category === category ? { ...gpt, category: newId } : gpt
+      );
+
+      chrome.storage.local.set({ gpts: updatedGPTs });
+      this.updateSetting('categories', categories);
+
+      this.data.gpts = updatedGPTs;
+      this.loadCategories();
+      this.updateDataSummary();
+      this.showToast('Catégorie modifiée', 'success');
     }
   }
 
