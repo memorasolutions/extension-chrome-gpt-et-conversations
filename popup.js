@@ -8,7 +8,8 @@ const AppState = {
   filters: {
     category: 'all',
     sort: 'name',
-    conversationFilter: 'all'
+    conversationFilter: 'all',
+    conversationCategory: 'all'
   },
   theme: 'light'
 };
@@ -198,14 +199,38 @@ const SyncManager = {
 
   editGPT(id) {
     const gpt = AppState.gpts.find(g => g.id === id);
-    let base = 'https://chatgpt.com';
-    if (gpt && gpt.url) {
-      try {
-        const u = new URL(gpt.url);
-        base = u.origin;
-      } catch (_) {}
-    }
-    chrome.tabs.create({ url: `${base}/gpts/editor/${id}` });
+    if (!gpt) return;
+
+    const modal = document.getElementById('itemModal');
+    const title = document.getElementById('modalTitle');
+    const body = document.getElementById('modalBody');
+
+    title.textContent = 'Modifier le GPT';
+    body.innerHTML = `
+      <div class="form-group">
+        <label for="editGptName">Nom</label>
+        <input type="text" id="editGptName" value="${gpt.name}">
+      </div>
+      <div class="form-group">
+        <label for="editGptCategory">Catégorie</label>
+        <select id="editGptCategory">
+          ${AppState.categories.map(c => `<option value="${c}" ${gpt.category===c?'selected':''}>${Utils.capitalize(c)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button id="saveGptEdit" class="add-btn">Enregistrer</button>
+      </div>
+    `;
+
+    modal.classList.add('show');
+    modal.querySelector('.modal-close').onclick = () => modal.classList.remove('show');
+    document.getElementById('saveGptEdit').onclick = async () => {
+      gpt.name = document.getElementById('editGptName').value.trim() || gpt.name;
+      gpt.category = document.getElementById('editGptCategory').value;
+      await Storage.set('gpts', AppState.gpts);
+      modal.classList.remove('show');
+      this.renderGPTs();
+    };
   },
 
   renderGPTs() {
@@ -301,6 +326,12 @@ const SyncManager = {
                 <line x1="10" y1="14" x2="21" y2="3"/>
               </svg>
             </button>
+            <button class="item-btn rename-btn" title="Renommer">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
             </div>
           </div>
           <div class="item-description">${conv.lastMessage}</div>
@@ -323,8 +354,9 @@ const SyncManager = {
     let filtered = AppState.gpts.filter(gpt => {
       const matchesSearch = gpt.name.toLowerCase().includes(AppState.searchQuery.toLowerCase()) ||
                            gpt.description.toLowerCase().includes(AppState.searchQuery.toLowerCase());
-      const matchesCategory = AppState.filters.category === 'all' || 
+      const matchesCategory = AppState.filters.category === 'all' ||
                              (AppState.filters.category === 'favorites' && gpt.favorite) ||
+                             (AppState.filters.category === 'recent' && new Date(gpt.lastUsed) >= new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ||
                              gpt.category === AppState.filters.category;
       return matchesSearch && matchesCategory;
     });
@@ -350,7 +382,7 @@ const SyncManager = {
     let filtered = AppState.conversations.filter(conv => {
       const matchesSearch = conv.title.toLowerCase().includes(AppState.searchQuery.toLowerCase()) ||
                            conv.lastMessage.toLowerCase().includes(AppState.searchQuery.toLowerCase());
-      
+
       let matchesFilter = true;
       const now = new Date();
       const convDate = new Date(conv.updatedAt);
@@ -372,7 +404,9 @@ const SyncManager = {
           break;
       }
 
-      return matchesSearch && matchesFilter;
+      const matchesCategory = AppState.filters.conversationCategory === 'all' || conv.category === AppState.filters.conversationCategory;
+
+      return matchesSearch && matchesFilter && matchesCategory;
     });
 
     return filtered.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
@@ -482,6 +516,24 @@ const SyncManager = {
 
         if (conv && conv.url) {
           chrome.tabs.create({ url: conv.url });
+        }
+      });
+    });
+
+    // Renommer via bouton
+    document.querySelectorAll('.rename-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.item-card');
+        const convId = card.dataset.id;
+        const conv = AppState.conversations.find(c => c.id === convId);
+        if (!conv) return;
+        const newTitle = prompt('Nouveau titre', conv.title);
+        if (newTitle && newTitle.trim() && newTitle !== conv.title) {
+          conv.title = newTitle.trim();
+          conv.updatedAt = new Date().toISOString();
+          await Storage.set('conversations', AppState.conversations);
+          this.renderConversations();
         }
       });
     });
@@ -694,6 +746,10 @@ const FormManager = {
     document.querySelectorAll('#gptCategory, #convCategory').forEach(sel => {
       sel.innerHTML = options;
     });
+    const filterSel = document.getElementById('convCategoryFilter');
+    if (filterSel) {
+      filterSel.innerHTML = `<option value="all">Toutes les catégories</option>${options}`;
+    }
   },
 
   updateStats() {
@@ -779,6 +835,14 @@ const NavigationManager = {
       AppState.filters.conversationFilter = e.target.value;
       SyncManager.renderConversations();
     });
+
+    const convCat = document.getElementById('convCategoryFilter');
+    if (convCat) {
+      convCat.addEventListener('change', (e) => {
+        AppState.filters.conversationCategory = e.target.value;
+        SyncManager.renderConversations();
+      });
+    }
   }
 };
 

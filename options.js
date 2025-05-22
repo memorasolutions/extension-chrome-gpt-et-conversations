@@ -107,6 +107,7 @@ class OptionsManager {
     const languageSelect = document.getElementById('language');
     languageSelect.addEventListener('change', (e) => {
       this.updateSetting('language', e.target.value);
+      this.applyLanguage(e.target.value);
     });
 
     // Notifications
@@ -217,7 +218,10 @@ class OptionsManager {
   async updateSetting(key, value) {
     this.settings[key] = value;
     await chrome.storage.local.set({ settings: this.settings });
-    
+    if (key === 'theme') {
+      await chrome.storage.local.set({ theme: value });
+    }
+
     // Notification du background script si nécessaire
     if (['autoSync', 'syncInterval', 'notifications'].includes(key)) {
       chrome.runtime.sendMessage({
@@ -243,6 +247,7 @@ class OptionsManager {
     // Application du thème
     this.applyTheme(this.settings.theme || 'light');
     this.applyColors();
+    this.applyLanguage(this.settings.language || 'fr');
 
     // Mise à jour du statut de sync
     this.updateSyncStatus();
@@ -260,6 +265,25 @@ class OptionsManager {
   applyColors() {
     document.documentElement.style.setProperty('--primary-color', this.settings.primaryColor);
     document.documentElement.style.setProperty('--background', this.settings.backgroundColor);
+  }
+
+  applyLanguage(lang) {
+    const texts = {
+      fr: {
+        general: 'Général',
+        syncNow: 'Synchroniser maintenant'
+      },
+      en: {
+        general: 'General',
+        syncNow: 'Sync now'
+      }
+    };
+
+    const t = texts[lang] || texts.fr;
+    const navGen = document.getElementById('navGeneral');
+    if (navGen) navGen.childNodes[2].nodeValue = t.general;
+    const syncBtn = document.getElementById('syncNow');
+    if (syncBtn) syncBtn.childNodes[syncBtn.childNodes.length-1].nodeValue = t.syncNow;
   }
 
   async updateSyncStatus(syncing = false) {
@@ -327,6 +351,9 @@ class OptionsManager {
         this.updateDataSummary();
         this.updateSyncStatus();
         this.updateStats();
+        this.renderGptList();
+        this.renderConvList();
+        this.loadCategories();
         this.showToast(`${gptRes.gpts?.length || 0} GPTs et ${convRes.conversations?.length || 0} conversations synchronisés`, 'success');
       } else {
         throw new Error('Échec de la synchronisation');
