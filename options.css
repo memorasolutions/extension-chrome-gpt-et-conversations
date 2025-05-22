@@ -156,6 +156,7 @@ body {
   margin-left: var(--sidebar-width);
   margin-top: 100px;
   padding: 40px;
+  padding-bottom: 80px; /* space for fixed footer */
   max-width: calc(100vw - var(--sidebar-width));
   width: 100%;
 }
@@ -800,6 +801,7 @@ body {
     margin-left: 0;
     margin-top: 100px;
     padding: 20px;
+    padding-bottom: 80px;
     order: 3;
   }
   
@@ -849,6 +851,7 @@ body {
   
   .main-content {
     padding: 16px;
+    padding-bottom: 80px;
   }
   
   .settings-group {
@@ -860,7 +863,12 @@ body {
   text-align: center;
   font-size: 13px;
   color: var(--text-secondary);
-  margin: 24px 0 0;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: var(--background);
+  padding: 8px 0;
 }
 
 .manage-list {

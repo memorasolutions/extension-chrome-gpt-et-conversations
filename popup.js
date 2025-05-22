@@ -94,6 +94,7 @@ const Storage = {
 const ThemeManager = {
   init() {
     this.loadTheme();
+    this.loadColors();
     document.getElementById('themeToggle').addEventListener('click', () => {
       this.toggleTheme();
     });
@@ -103,6 +104,13 @@ const ThemeManager = {
     const savedTheme = await Storage.get('theme') || 'light';
     AppState.theme = savedTheme;
     document.documentElement.setAttribute('data-theme', savedTheme);
+  },
+
+  async loadColors() {
+    const primary = await Storage.get('primaryColor');
+    const background = await Storage.get('backgroundColor');
+    if (primary) document.documentElement.style.setProperty('--primary-color', primary);
+    if (background) document.documentElement.style.setProperty('--background', background);
   },
 
   async toggleTheme() {
@@ -455,6 +463,7 @@ const FormManager = {
     this.setupAddGPTForm();
     this.setupAddConversationForm();
     this.setupImportExport();
+    this.setupAddSwitcher();
   },
 
   setupAddGPTForm() {
@@ -592,6 +601,20 @@ const FormManager = {
       });
       
       input.click();
+    });
+  },
+
+  setupAddSwitcher() {
+    const buttons = document.querySelectorAll('.switch-btn');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.dataset.target;
+        document.querySelectorAll('.add-section').forEach(sec => {
+          sec.classList.toggle('active', sec.id === target);
+        });
+      });
     });
   },
 

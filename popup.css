@@ -40,7 +40,7 @@ body {
   line-height: 1.5;
   width: 400px;
   max-height: 600px;
-  overflow-y: auto;
+  overflow-y: hidden;
 }
 
 /* Container principal */
@@ -48,6 +48,7 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  padding-bottom: 32px; /* space for footer */
 }
 
 /* Header */
@@ -255,7 +256,7 @@ body {
   cursor: pointer;
   transition: var(--transition);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .item-card:hover {
@@ -293,10 +294,8 @@ body {
   color: var(--text-secondary);
   line-height: 1.4;
   margin-bottom: 12px;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  display: block;
+  overflow: visible;
 }
 
 .item-footer {
@@ -385,6 +384,10 @@ body {
   padding: 20px;
   margin-bottom: 16px;
   border: 1px solid var(--border);
+  display: none;
+}
+.add-section.active {
+  display: block;
 }
 
 .add-section h3 {
@@ -398,6 +401,26 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.add-switcher {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.switch-btn {
+  flex: 1;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 6px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+.switch-btn.active {
+  background: var(--primary-color);
+  color: #fff;
 }
 
 .form-group {
@@ -530,7 +553,11 @@ body {
   text-align: center;
   font-size: 12px;
   color: var(--text-secondary);
-  margin-top: 8px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  background: var(--background);
+  padding: 4px 0;
 }
 
 /* Modal */
