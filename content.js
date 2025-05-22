@@ -2,10 +2,12 @@
 // Ce script s'exécute dans le contexte de la page ChatGPT
 
 class ChatGPTScraper {
-  constructor() {
+  constructor(autoInit = true) {
     this.isInitialized = false;
     this.observers = new Map();
-    this.init();
+    if (autoInit && typeof document !== 'undefined') {
+      this.init();
+    }
   }
 
   init() {
@@ -197,7 +199,9 @@ class ChatGPTScraper {
 
       // Si pas de nom trouvé, utiliser le texte de l'élément
       if (!name) {
-        name = element.textContent?.trim().split('\n')[0] || 'GPT Sans Nom';
+        const raw = element.textContent?.trim().split('\n')[0] || '';
+        const filtered = this.filterFallbackName(raw);
+        name = filtered || 'GPT Sans Nom';
       }
 
       // Extraction de la description
@@ -269,12 +273,20 @@ class ChatGPTScraper {
 
   cleanText(text) {
     if (!text) return '';
-    
+
     return text
       .replace(/\s+/g, ' ')
       .replace(/[^\w\s\-.,!?()]/g, '')
       .trim()
       .substring(0, 200); // Limite la longueur
+  }
+
+  filterFallbackName(text) {
+    const t = text.trim();
+    if (/^(today|hier)$/i.test(t) || /^\d{1,2}\/\d{1,2}/.test(t)) {
+      return '';
+    }
+    return t;
   }
 
   categorizeGPT(name, description) {
@@ -470,7 +482,7 @@ class ChatGPTScraper {
 let scraper = null;
 
 // Vérifier si on est sur ChatGPT
-if (window.location.hostname.includes('openai.com') || window.location.hostname.includes('chatgpt.com')) {
+if (typeof window !== 'undefined' && (window.location.hostname.includes('openai.com') || window.location.hostname.includes('chatgpt.com'))) {
   scraper = new ChatGPTScraper();
 
   // Nettoyage lors du changement de page

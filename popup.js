@@ -183,6 +183,11 @@ const SyncManager = {
     await Storage.set('stats', stats);
   },
 
+  editGPT(id) {
+    const url = chrome.runtime.getURL(`options.html?edit=${id}`);
+    chrome.tabs.create({ url });
+  },
+
   renderGPTs() {
     const container = document.getElementById('gptsList');
     const filteredGPTs = this.filterAndSortGPTs();
@@ -384,6 +389,16 @@ const SyncManager = {
       });
     });
 
+    // Édition
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.item-card');
+        const gptId = card.dataset.id;
+        SyncManager.editGPT(gptId);
+      });
+    });
+
     // Suppression
     document.querySelectorAll('.delete-btn').forEach(btn => {
       btn.addEventListener('click', async (e) => {
@@ -438,6 +453,7 @@ const SyncManager = {
 const FormManager = {
   init() {
     this.setupAddGPTForm();
+    this.setupAddConversationForm();
     this.setupImportExport();
   },
 
@@ -483,6 +499,38 @@ const FormManager = {
       this.updateStats();
       
       Utils.showToast('GPT ajouté avec succès');
+    });
+  },
+
+  setupAddConversationForm() {
+    const form = document.getElementById('addConvForm');
+    if (!form) return;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const title = document.getElementById('convTitle').value.trim();
+      const url = document.getElementById('convUrl').value.trim();
+      const lastMessage = document.getElementById('convLastMessage').value.trim();
+
+      if (!title) {
+        Utils.showToast('Le titre est requis', 'error');
+        return;
+      }
+
+      const conv = {
+        id: Utils.generateId(),
+        title,
+        url,
+        lastMessage,
+        starred: false,
+        messageCount: 0,
+        updatedAt: new Date().toISOString()
+      };
+      AppState.conversations.push(conv);
+      await Storage.set('conversations', AppState.conversations);
+      form.reset();
+      SyncManager.renderConversations();
+      this.updateStats();
+      Utils.showToast('Conversation ajoutée');
     });
   },
 
