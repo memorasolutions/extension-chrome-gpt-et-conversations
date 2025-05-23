@@ -278,7 +278,7 @@ input[type="color"].setting-input {
   box-shadow: 0 0 0 3px var(--primary-light);
 }
 
-/* Toggle Switch */
+/* Toggle Switch - CORRIGÉ */
 .toggle {
   position: relative;
   display: inline-block;
@@ -311,18 +311,29 @@ input[type="color"].setting-input {
   width: 22px;
   left: 3px;
   bottom: 3px;
-  background-color: var(--primary-color);
+  background-color: white;
   border-radius: 50%;
   transition: var(--transition);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
+/* État coché - CORRIGÉ */
 .toggle input:checked + .toggle-slider {
-  background-color: #ccc;
+  background-color: var(--primary-color);
 }
 
 .toggle input:checked + .toggle-slider:before {
   transform: translateX(24px);
+  background-color: white;
+}
+
+/* Hover effects */
+.toggle-slider:hover {
+  box-shadow: 0 0 4px rgba(16, 163, 127, 0.3);
+}
+
+.toggle input:checked + .toggle-slider:hover {
+  background-color: var(--primary-hover);
 }
 
 /* Buttons */
@@ -745,7 +756,7 @@ input[type="color"].setting-input {
   color: var(--text-primary);
 }
 
-/* Toast Notifications */
+/* Toast Notifications - CORRIGÉ */
 .toast-container {
   position: fixed;
   top: 20px;
@@ -757,28 +768,29 @@ input[type="color"].setting-input {
 }
 
 .toast {
-  background: #ffffff;
+  background: #ffffff !important;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 16px 20px;
   box-shadow: 0 4px 12px var(--shadow);
   min-width: 300px;
   animation: slideInRight 0.3s ease-out;
+  color: var(--text-primary) !important;
 }
 
 .toast.success {
-  border-color: var(--primary-color);
-  background: #ffffff;
+  border-left: 4px solid var(--primary-color);
+  background: #ffffff !important;
 }
 
 .toast.error {
-  border-color: #ef4444;
-  background: #ffffff;
+  border-left: 4px solid #ef4444;
+  background: #ffffff !important;
 }
 
 .toast.warning {
-  border-color: #f59e0b;
-  background: #ffffff;
+  border-left: 4px solid #f59e0b;
+  background: #ffffff !important;
 }
 
 @keyframes slideInRight {

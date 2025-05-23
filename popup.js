@@ -60,7 +60,9 @@ const Utils = {
     document.body.appendChild(toast);
     
     setTimeout(() => {
-      toast.remove();
+      if (toast.parentNode) {
+        toast.remove();
+      }
     }, 3000);
   },
 
@@ -101,9 +103,12 @@ const ThemeManager = {
   init() {
     this.loadTheme();
     this.loadColors();
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      this.toggleTheme();
-    });
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        this.toggleTheme();
+      });
+    }
   },
 
   async loadTheme() {
@@ -131,7 +136,7 @@ const ThemeManager = {
 const SyncManager = {
   async syncGPTs() {
     const syncBtn = document.getElementById('syncBtn');
-    syncBtn.classList.add('syncing');
+    if (syncBtn) syncBtn.classList.add('syncing');
     
     try {
       // Envoi d'un message au content script pour récupérer les GPTs
@@ -161,7 +166,7 @@ const SyncManager = {
       console.error('Erreur de synchronisation:', error);
       Utils.showToast('Erreur lors de la synchronisation', 'error');
     } finally {
-      syncBtn.classList.remove('syncing');
+      if (syncBtn) syncBtn.classList.remove('syncing');
     }
   },
 
@@ -197,44 +202,47 @@ const SyncManager = {
     await Storage.set('stats', stats);
   },
 
+  // Fonction d'édition des GPT dans le popup - CORRIGÉE
   editGPT(id) {
     const gpt = AppState.gpts.find(g => g.id === id);
     if (!gpt) return;
 
-    const modal = document.getElementById('itemModal');
-    const title = document.getElementById('modalTitle');
-    const body = document.getElementById('modalBody');
-
-    title.textContent = 'Modifier le GPT';
-    body.innerHTML = `
-      <div class="form-group">
-        <label for="editGptName">Nom</label>
-        <input type="text" id="editGptName" value="${gpt.name}">
-      </div>
-      <div class="form-group">
-        <label for="editGptCategory">Catégorie</label>
-        <select id="editGptCategory">
-          ${AppState.categories.map(c => `<option value="${c}" ${gpt.category===c?'selected':''}>${Utils.capitalize(c)}</option>`).join('')}
-        </select>
-      </div>
-      <div class="modal-actions">
-        <button id="saveGptEdit" class="add-btn">Enregistrer</button>
-      </div>
-    `;
-
-    modal.classList.add('show');
-    modal.querySelector('.modal-close').onclick = () => modal.classList.remove('show');
-    document.getElementById('saveGptEdit').onclick = async () => {
-      gpt.name = document.getElementById('editGptName').value.trim() || gpt.name;
-      gpt.category = document.getElementById('editGptCategory').value;
-      await Storage.set('gpts', AppState.gpts);
-      modal.classList.remove('show');
+    // Créer un prompt simple pour l'édition
+    const newName = prompt('Nouveau nom du GPT:', gpt.name);
+    if (newName && newName.trim() && newName !== gpt.name) {
+      gpt.name = newName.trim();
+      Storage.set('gpts', AppState.gpts);
       this.renderGPTs();
-    };
+      Utils.showToast('GPT modifié', 'success');
+    }
+  },
+
+  // Fonction d'édition de catégorie des GPT - CORRIGÉE
+  editGPTCategory(id) {
+    const gpt = AppState.gpts.find(g => g.id === id);
+    if (!gpt) return;
+
+    const categoryOptions = AppState.categories.map(cat => 
+      `${cat === gpt.category ? '✓' : ' '} ${Utils.capitalize(cat)}`
+    ).join('\n');
+
+    const selectedCategory = prompt(
+      `Choisir une catégorie pour "${gpt.name}":\n\n${categoryOptions}\n\nEntrez le nom de la catégorie:`,
+      gpt.category
+    );
+
+    if (selectedCategory && selectedCategory.trim() && AppState.categories.includes(selectedCategory.trim())) {
+      gpt.category = selectedCategory.trim();
+      Storage.set('gpts', AppState.gpts);
+      this.renderGPTs();
+      Utils.showToast('Catégorie modifiée', 'success');
+    }
   },
 
   renderGPTs() {
     const container = document.getElementById('gptsList');
+    if (!container) return;
+    
     const filteredGPTs = this.filterAndSortGPTs();
     
     if (filteredGPTs.length === 0) {
@@ -254,20 +262,23 @@ const SyncManager = {
     container.innerHTML = filteredGPTs.map(gpt => `
       <div class="item-card" data-id="${gpt.id}">
         <div class="item-header">
-          <div class="item-title"><img class="item-icon" src="${gpt.iconUrl || 'icons/icon16.png'}" alt="">${gpt.name}</div>
+          <div class="item-title">
+            <img class="item-icon" src="${gpt.iconUrl || 'icons/icon16.png'}" alt="">
+            ${gpt.name}
+          </div>
           <div class="item-actions">
-            <button class="item-btn favorite-btn ${gpt.favorite ? 'active' : ''}" title="Marquer comme favori">
+            <button class="item-btn favorite-btn ${gpt.favorite ? 'active' : ''}" title="Marquer comme favori" data-action="favorite">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="${gpt.favorite ? 'currentColor' : 'none'}" stroke="currentColor">
                 <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
               </svg>
             </button>
-            <button class="item-btn edit-btn" title="Modifier">
+            <button class="item-btn edit-btn" title="Modifier" data-action="edit">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
               </svg>
             </button>
-            <button class="item-btn delete-btn" title="Supprimer">
+            <button class="item-btn delete-btn" title="Supprimer" data-action="delete">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <polyline points="3,6 5,6 21,6"/>
                 <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"/>
@@ -276,17 +287,19 @@ const SyncManager = {
           </div>
         </div>
         <div class="item-description">${gpt.description}</div>
-          <div class="item-footer">
-            <div class="item-meta">
-              <span class="category-badge">${gpt.category}</span>
-              <span>${Utils.formatDate(gpt.lastUsed)}</span>
-            </div>
-            <select class="category-select">
-              ${AppState.categories.map(c => `<option value="${c}" ${gpt.category===c?'selected':''}>${Utils.capitalize(c)}</option>`).join('')}
-            </select>
+        <div class="item-footer">
+          <div class="item-meta">
+            <span class="category-badge">${gpt.category}</span>
+            <span>${Utils.formatDate(gpt.lastUsed)}</span>
           </div>
+          <button class="item-btn category-btn" title="Changer catégorie" data-action="category">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M4 4H20V6H4V4ZM4 8H20V10H4V8ZM4 12H20V14H4V12ZM4 16H20V18H4V16Z"/>
+            </svg>
+          </button>
         </div>
-      `).join('');
+      </div>
+    `).join('');
 
     // Ajout des event listeners
     this.attachGPTEventListeners();
@@ -294,6 +307,8 @@ const SyncManager = {
 
   renderConversations() {
     const container = document.getElementById('conversationsList');
+    if (!container) return;
+    
     const filteredConversations = this.filterConversations();
     
     if (filteredConversations.length === 0) {
@@ -309,43 +324,48 @@ const SyncManager = {
       return;
     }
 
-      container.innerHTML = filteredConversations.map(conv => `
-        <div class="item-card" data-id="${conv.id}">
-          <div class="item-header">
-            <div class="item-title"><img class="item-icon" src="icons/icon16.png" alt="">${conv.title}</div>
-            <div class="item-actions">
-            <button class="item-btn star-btn ${conv.starred ? 'active' : ''}" title="Marquer avec une étoile">
+    container.innerHTML = filteredConversations.map(conv => `
+      <div class="item-card" data-id="${conv.id}">
+        <div class="item-header">
+          <div class="item-title" data-action="rename-title">
+            <img class="item-icon" src="icons/icon16.png" alt="">
+            ${conv.title}
+          </div>
+          <div class="item-actions">
+            <button class="item-btn star-btn ${conv.starred ? 'active' : ''}" title="Marquer avec une étoile" data-action="star">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="${conv.starred ? 'currentColor' : 'none'}" stroke="currentColor">
                 <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
               </svg>
             </button>
-            <button class="item-btn open-btn" title="Ouvrir">
+            <button class="item-btn open-btn" title="Ouvrir" data-action="open">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
                 <polyline points="15,3 21,3 21,9"/>
                 <line x1="10" y1="14" x2="21" y2="3"/>
               </svg>
             </button>
-            <button class="item-btn rename-btn" title="Renommer">
+            <button class="item-btn rename-btn" title="Renommer" data-action="rename">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
               </svg>
             </button>
-            </div>
-          </div>
-          <div class="item-description">${conv.lastMessage}</div>
-          <div class="item-footer">
-            <div class="item-meta">
-              <span>${conv.messageCount} messages</span>
-              <span>${Utils.formatDate(conv.updatedAt)}</span>
-            </div>
-            <select class="category-select">
-              ${AppState.categories.map(c => `<option value="${c}" ${conv.category===c?'selected':''}>${Utils.capitalize(c)}</option>`).join('')}
-            </select>
           </div>
         </div>
-      `).join('');
+        <div class="item-description">${conv.lastMessage}</div>
+        <div class="item-footer">
+          <div class="item-meta">
+            <span>${conv.messageCount} messages</span>
+            <span>${Utils.formatDate(conv.updatedAt)}</span>
+          </div>
+          <button class="item-btn category-btn" title="Changer catégorie" data-action="category">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M4 4H20V6H4V4ZM4 8H20V10H4V8ZM4 12H20V14H4V12ZM4 16H20V18H4V16Z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
 
     this.attachConversationEventListeners();
   },
@@ -412,168 +432,184 @@ const SyncManager = {
     return filtered.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
   },
 
+  // Gestionnaire d'événements pour les GPT - CORRIGÉ
   attachGPTEventListeners() {
-    // Favoris
-    document.querySelectorAll('.favorite-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const card = btn.closest('.item-card');
-        const gptId = card.dataset.id;
-        const gpt = AppState.gpts.find(g => g.id === gptId);
-        
-        if (gpt) {
-          gpt.favorite = !gpt.favorite;
-          await Storage.set('gpts', AppState.gpts);
-          this.renderGPTs();
-        }
-      });
-    });
+    // Gestionnaire délégué pour tous les boutons
+    const container = document.getElementById('gptsList');
+    if (!container) return;
 
-    // Ouverture des GPTs
-    document.querySelectorAll('.item-card').forEach(card => {
-      card.addEventListener('click', async (e) => {
-        if (e.target.closest('.item-btn') || e.target.closest('select')) return;
-        
-        const gptId = card.dataset.id;
-        const gpt = AppState.gpts.find(g => g.id === gptId);
-        
-        if (gpt && gpt.url) {
-          // Mise à jour du compteur d'utilisation
+    container.addEventListener('click', async (e) => {
+      const button = e.target.closest('.item-btn');
+      const card = e.target.closest('.item-card');
+      
+      if (!card) return;
+      
+      const gptId = card.dataset.id;
+      const gpt = AppState.gpts.find(g => g.id === gptId);
+      if (!gpt) return;
+
+      if (button) {
+        e.stopPropagation();
+        const action = button.dataset.action;
+
+        switch (action) {
+          case 'favorite':
+            gpt.favorite = !gpt.favorite;
+            await Storage.set('gpts', AppState.gpts);
+            this.renderGPTs();
+            break;
+
+          case 'edit':
+            this.editGPT(gptId);
+            break;
+
+          case 'category':
+            this.editGPTCategory(gptId);
+            break;
+
+          case 'delete':
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce GPT ?')) {
+              AppState.gpts = AppState.gpts.filter(g => g.id !== gptId);
+              await Storage.set('gpts', AppState.gpts);
+              this.renderGPTs();
+              Utils.showToast('GPT supprimé');
+            }
+            break;
+        }
+      } else {
+        // Clic sur la carte pour ouvrir le GPT
+        if (gpt.url) {
           gpt.usageCount = (gpt.usageCount || 0) + 1;
           gpt.lastUsed = new Date().toISOString();
           await Storage.set('gpts', AppState.gpts);
-          
-          // Ouverture dans un nouvel onglet
           chrome.tabs.create({ url: gpt.url });
         }
-      });
+      }
     });
+  },
 
-    // Édition
-    document.querySelectorAll('.edit-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const card = btn.closest('.item-card');
-        const gptId = card.dataset.id;
-        SyncManager.editGPT(gptId);
-      });
-    });
-
-    // Suppression
-      document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        
-        if (confirm('Êtes-vous sûr de vouloir supprimer ce GPT ?')) {
-          const card = btn.closest('.item-card');
-          const gptId = card.dataset.id;
-          AppState.gpts = AppState.gpts.filter(g => g.id !== gptId);
-          await Storage.set('gpts', AppState.gpts);
-          this.renderGPTs();
-          Utils.showToast('GPT supprimé');
-        }
-        });
-      });
-
-      // Changer catégorie
-      document.querySelectorAll('.item-card .category-select').forEach(sel => {
-        sel.addEventListener('change', async (e) => {
-          const card = sel.closest('.item-card');
-          const gptId = card.dataset.id;
-          const gpt = AppState.gpts.find(g => g.id === gptId);
-          if (gpt) {
-            gpt.category = sel.value;
-            await Storage.set('gpts', AppState.gpts);
-          }
-        });
-      });
-    },
-
+  // Gestionnaire d'événements pour les conversations - CORRIGÉ
   attachConversationEventListeners() {
-    // Étoiler
-    document.querySelectorAll('.star-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
+    const container = document.getElementById('conversationsList');
+    if (!container) return;
+
+    container.addEventListener('click', async (e) => {
+      const button = e.target.closest('.item-btn');
+      const titleElement = e.target.closest('[data-action="rename-title"]');
+      const card = e.target.closest('.item-card');
+      
+      if (!card) return;
+      
+      const convId = card.dataset.id;
+      const conv = AppState.conversations.find(c => c.id === convId);
+      if (!conv) return;
+
+      if (button) {
         e.stopPropagation();
-        const card = btn.closest('.item-card');
-        const convId = card.dataset.id;
-        const conv = AppState.conversations.find(c => c.id === convId);
-        
-        if (conv) {
-          conv.starred = !conv.starred;
-          await Storage.set('conversations', AppState.conversations);
-          this.renderConversations();
+        const action = button.dataset.action;
+
+        switch (action) {
+          case 'star':
+            conv.starred = !conv.starred;
+            await Storage.set('conversations', AppState.conversations);
+            this.renderConversations();
+            break;
+
+          case 'open':
+            if (conv.url) {
+              chrome.tabs.create({ url: conv.url });
+            }
+            break;
+
+          case 'rename':
+            this.renameConversation(convId);
+            break;
+
+          case 'category':
+            this.editConversationCategory(convId);
+            break;
         }
-      });
-    });
-
-    // Ouvrir conversation
-    document.querySelectorAll('.open-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      } else if (titleElement) {
+        // Double clic sur le titre pour renommer
         e.stopPropagation();
-        const card = btn.closest('.item-card');
-        const convId = card.dataset.id;
-        const conv = AppState.conversations.find(c => c.id === convId);
-
-        if (conv && conv.url) {
+        this.renameConversation(convId);
+      } else {
+        // Clic sur la carte pour ouvrir
+        if (conv.url) {
           chrome.tabs.create({ url: conv.url });
         }
-      });
+      }
     });
 
-    // Renommer via bouton
-    document.querySelectorAll('.rename-btn').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const card = btn.closest('.item-card');
-        const convId = card.dataset.id;
-        const conv = AppState.conversations.find(c => c.id === convId);
-        if (!conv) return;
-        const newTitle = prompt('Nouveau titre', conv.title);
-        if (newTitle && newTitle.trim() && newTitle !== conv.title) {
-          conv.title = newTitle.trim();
-          conv.updatedAt = new Date().toISOString();
-          await Storage.set('conversations', AppState.conversations);
-          this.renderConversations();
+    // Gestionnaire pour double-clic sur le titre
+    container.addEventListener('dblclick', (e) => {
+      const titleElement = e.target.closest('.item-title');
+      if (titleElement) {
+        const card = titleElement.closest('.item-card');
+        if (card) {
+          const convId = card.dataset.id;
+          this.renameConversation(convId);
         }
-      });
+      }
     });
+  },
 
-    // Changer catégorie
-    document.querySelectorAll('.item-card .category-select').forEach(sel => {
-      sel.addEventListener('change', async () => {
-        const card = sel.closest('.item-card');
-        const convId = card.dataset.id;
-        const conv = AppState.conversations.find(c => c.id === convId);
-        if (conv) {
-          conv.category = sel.value;
-          await Storage.set('conversations', AppState.conversations);
-        }
-      });
-    });
+  // Fonction pour renommer une conversation - CORRIGÉE
+  renameConversation(id) {
+    const conv = AppState.conversations.find(c => c.id === id);
+    if (!conv) return;
 
-    // Renommer conversation par double-clic
-    document.querySelectorAll('.item-title').forEach(titleEl => {
-      titleEl.addEventListener('dblclick', async (e) => {
-        e.stopPropagation();
-        const card = titleEl.closest('.item-card');
-        const convId = card.dataset.id;
-        const conv = AppState.conversations.find(c => c.id === convId);
-        if (!conv) return;
-        const newTitle = prompt('Nouveau titre', conv.title);
-        if (newTitle && newTitle.trim() && newTitle !== conv.title) {
-          conv.title = newTitle.trim();
-          conv.updatedAt = new Date().toISOString();
-          await Storage.set('conversations', AppState.conversations);
-          this.renderConversations();
-          try {
-            const tabs = await chrome.tabs.query({ url: ['*://chat.openai.com/*', '*://chatgpt.com/*'] });
-            if (tabs[0]) {
-              chrome.tabs.sendMessage(tabs[0].id, { action: 'renameConversation', id: conv.id, title: conv.title });
-            }
-          } catch (_) {}
-        }
-      });
-    });
+    const newTitle = prompt('Nouveau titre de la conversation:', conv.title);
+    if (newTitle && newTitle.trim() && newTitle !== conv.title) {
+      conv.title = newTitle.trim();
+      conv.updatedAt = new Date().toISOString();
+      Storage.set('conversations', AppState.conversations);
+      this.renderConversations();
+      
+      // Essayer de notifier ChatGPT du changement
+      this.notifyChatGPTRename(conv.id, conv.title);
+      
+      Utils.showToast('Conversation renommée', 'success');
+    }
+  },
+
+  // Fonction pour changer la catégorie d'une conversation
+  editConversationCategory(id) {
+    const conv = AppState.conversations.find(c => c.id === id);
+    if (!conv) return;
+
+    const categoryOptions = AppState.categories.map(cat => 
+      `${cat === conv.category ? '✓' : ' '} ${Utils.capitalize(cat)}`
+    ).join('\n');
+
+    const selectedCategory = prompt(
+      `Choisir une catégorie pour "${conv.title}":\n\n${categoryOptions}\n\nEntrez le nom de la catégorie:`,
+      conv.category || 'other'
+    );
+
+    if (selectedCategory && selectedCategory.trim() && AppState.categories.includes(selectedCategory.trim())) {
+      conv.category = selectedCategory.trim();
+      Storage.set('conversations', AppState.conversations);
+      this.renderConversations();
+      Utils.showToast('Catégorie modifiée', 'success');
+    }
+  },
+
+  // Notifier ChatGPT du renommage
+  async notifyChatGPTRename(convId, newTitle) {
+    try {
+      const tabs = await chrome.tabs.query({ url: ['*://chat.openai.com/*', '*://chatgpt.com/*'] });
+      if (tabs.length > 0) {
+        chrome.tabs.sendMessage(tabs[0].id, { 
+          action: 'renameConversation', 
+          id: convId, 
+          title: newTitle 
+        });
+      }
+    } catch (error) {
+      // Erreur silencieuse, pas critique
+      console.warn('Impossible de notifier ChatGPT du renommage:', error);
+    }
   }
 };
 
@@ -589,17 +625,18 @@ const FormManager = {
 
   setupAddGPTForm() {
     const form = document.getElementById('addGptForm');
+    if (!form) return;
+    
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const formData = new FormData(form);
       const gptData = {
         id: Utils.generateId(),
-        name: formData.get('gptName') || document.getElementById('gptName').value,
-        description: formData.get('gptDescription') || document.getElementById('gptDescription').value,
-        url: formData.get('gptUrl') || document.getElementById('gptUrl').value,
+        name: document.getElementById('gptName').value.trim(),
+        description: document.getElementById('gptDescription').value.trim(),
+        url: document.getElementById('gptUrl').value.trim(),
         iconUrl: '',
-        category: formData.get('gptCategory') || document.getElementById('gptCategory').value,
+        category: document.getElementById('gptCategory').value,
         favorite: false,
         usageCount: 0,
         createdAt: new Date().toISOString(),
@@ -607,7 +644,7 @@ const FormManager = {
       };
 
       // Validation
-      if (!gptData.name.trim()) {
+      if (!gptData.name) {
         Utils.showToast('Le nom du GPT est requis', 'error');
         return;
       }
@@ -635,6 +672,7 @@ const FormManager = {
   setupAddConversationForm() {
     const form = document.getElementById('addConvForm');
     if (!form) return;
+    
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const title = document.getElementById('convTitle').value.trim();
@@ -668,77 +706,83 @@ const FormManager = {
 
   setupImportExport() {
     // Export
-    document.getElementById('exportBtn').addEventListener('click', async () => {
-      const data = {
-        gpts: AppState.gpts,
-        conversations: AppState.conversations,
-        exportDate: new Date().toISOString(),
-        version: '1.0'
-      };
+    const exportBtn = document.getElementById('exportBtn');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', async () => {
+        const data = {
+          gpts: AppState.gpts,
+          conversations: AppState.conversations,
+          exportDate: new Date().toISOString(),
+          version: '1.0'
+        };
 
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `chatgpt-sync-backup-${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
-      
-      URL.revokeObjectURL(url);
-      Utils.showToast('Données exportées');
-    });
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `chatgpt-sync-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        
+        URL.revokeObjectURL(url);
+        Utils.showToast('Données exportées');
+      });
+    }
 
     // Import
-    document.getElementById('importBtn').addEventListener('click', () => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = '.json';
-      
-      input.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    const importBtn = document.getElementById('importBtn');
+    if (importBtn) {
+      importBtn.addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        
+        input.addEventListener('change', async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
 
-        try {
-          const text = await file.text();
-          const data = JSON.parse(text);
-          
-          if (data.gpts) {
-            AppState.gpts = [...AppState.gpts, ...data.gpts];
-            await Storage.set('gpts', AppState.gpts);
+          try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+            
+            if (data.gpts) {
+              AppState.gpts = [...AppState.gpts, ...data.gpts];
+              await Storage.set('gpts', AppState.gpts);
+            }
+            
+            if (data.conversations) {
+              AppState.conversations = [...AppState.conversations, ...data.conversations];
+              await Storage.set('conversations', AppState.conversations);
+            }
+            
+            SyncManager.renderGPTs();
+            SyncManager.renderConversations();
+            this.updateStats();
+            
+            Utils.showToast('Données importées avec succès');
+          } catch (error) {
+            console.error('Erreur d\'import:', error);
+            Utils.showToast('Erreur lors de l\'import du fichier', 'error');
           }
-          
-          if (data.conversations) {
-            AppState.conversations = [...AppState.conversations, ...data.conversations];
-            await Storage.set('conversations', AppState.conversations);
-          }
-          
-          SyncManager.renderGPTs();
-          SyncManager.renderConversations();
-          this.updateStats();
-          
-          Utils.showToast('Données importées avec succès');
-        } catch (error) {
-          console.error('Erreur d\'import:', error);
-          Utils.showToast('Erreur lors de l\'import du fichier', 'error');
-        }
+        });
+        
+        input.click();
       });
-      
-      input.click();
-    });
+    }
   },
 
   setupAddSwitcher() {
     const buttons = document.querySelectorAll('.switch-btn');
-      buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          buttons.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          const target = btn.dataset.target;
-          document.querySelectorAll('.add-section').forEach(sec => {
-            sec.classList.toggle('active', sec.id === target);
-          });
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.dataset.target;
+        document.querySelectorAll('.add-section').forEach(sec => {
+          sec.classList.toggle('active', sec.id === target);
         });
       });
+    });
   },
 
   populateCategorySelects() {
@@ -754,10 +798,15 @@ const FormManager = {
 
   updateStats() {
     Storage.get('stats').then(stats => {
-      document.getElementById('gptCount').textContent = `${stats?.totalGPTs ?? AppState.gpts.length} GPTs`;
-      document.getElementById('conversationCount').textContent = `${stats?.totalConversations ?? AppState.conversations.length} conversations`;
-      if (stats && stats.lastSyncTime) {
-        document.getElementById('lastSync').textContent = Utils.formatDate(stats.lastSyncTime);
+      const gptCount = document.getElementById('gptCount');
+      if (gptCount) gptCount.textContent = `${stats?.totalGPTs ?? AppState.gpts.length} GPTs`;
+      
+      const conversationCount = document.getElementById('conversationCount');
+      if (conversationCount) conversationCount.textContent = `${stats?.totalConversations ?? AppState.conversations.length} conversations`;
+      
+      const lastSync = document.getElementById('lastSync');
+      if (lastSync && stats && stats.lastSyncTime) {
+        lastSync.textContent = Utils.formatDate(stats.lastSyncTime);
       }
     });
   }
@@ -804,6 +853,8 @@ const NavigationManager = {
 
   setupSearch() {
     const searchInput = document.getElementById('searchInput');
+    if (!searchInput) return;
+    
     const debouncedSearch = Utils.debounce((query) => {
       AppState.searchQuery = query;
       if (AppState.currentTab === 'gpts') {
@@ -820,21 +871,30 @@ const NavigationManager = {
 
   setupFilters() {
     // Filtres GPTs
-    document.getElementById('categoryFilter').addEventListener('change', (e) => {
-      AppState.filters.category = e.target.value;
-      SyncManager.renderGPTs();
-    });
+    const categoryFilter = document.getElementById('categoryFilter');
+    if (categoryFilter) {
+      categoryFilter.addEventListener('change', (e) => {
+        AppState.filters.category = e.target.value;
+        SyncManager.renderGPTs();
+      });
+    }
 
-    document.getElementById('sortFilter').addEventListener('change', (e) => {
-      AppState.filters.sort = e.target.value;
-      SyncManager.renderGPTs();
-    });
+    const sortFilter = document.getElementById('sortFilter');
+    if (sortFilter) {
+      sortFilter.addEventListener('change', (e) => {
+        AppState.filters.sort = e.target.value;
+        SyncManager.renderGPTs();
+      });
+    }
 
     // Filtres conversations
-    document.getElementById('conversationFilter').addEventListener('change', (e) => {
-      AppState.filters.conversationFilter = e.target.value;
-      SyncManager.renderConversations();
-    });
+    const conversationFilter = document.getElementById('conversationFilter');
+    if (conversationFilter) {
+      conversationFilter.addEventListener('change', (e) => {
+        AppState.filters.conversationFilter = e.target.value;
+        SyncManager.renderConversations();
+      });
+    }
 
     const convCat = document.getElementById('convCategoryFilter');
     if (convCat) {
@@ -848,52 +908,65 @@ const NavigationManager = {
 
 // Initialisation de l'application
 document.addEventListener('DOMContentLoaded', async () => {
-  // Chargement des données sauvegardées
-  const savedGPTs = await Storage.get('gpts') || [];
-  const savedConversations = await Storage.get('conversations') || [];
-  const settings = await Storage.get('settings') || {};
-
-  AppState.gpts = savedGPTs;
-  AppState.conversations = savedConversations.map(c => ({ category: 'other', ...c }));
-  AppState.categories = settings.categories || [];
-
-  // Initialisation des gestionnaires
-  ThemeManager.init();
-  NavigationManager.init();
-  FormManager.init();
-
-  // Configuration des boutons principaux
-  document.getElementById('syncBtn').addEventListener('click', async () => {
-    await SyncManager.syncGPTs();
-    await SyncManager.syncConversations();
-    await SyncManager.updateSyncStats();
-    FormManager.updateStats();
-  });
-
-  document.getElementById('settingsBtn').addEventListener('click', () => {
-    chrome.runtime.openOptionsPage();
-  });
-
-  // Rendu initial
-  SyncManager.renderGPTs();
-  FormManager.updateStats();
-
-  // Auto-sync au démarrage si l'utilisateur est sur ChatGPT
   try {
-    const tabs = await chrome.tabs.query({ 
-      active: true, 
-      url: ['*://chat.openai.com/*', '*://chatgpt.com/*'] 
-    });
-    
-    if (tabs.length > 0) {
-      setTimeout(() => {
-        SyncManager.syncGPTs().then(() => {
-          SyncManager.updateSyncStats();
-          FormManager.updateStats();
-        });
-      }, 1000);
+    // Chargement des données sauvegardées
+    const savedGPTs = await Storage.get('gpts') || [];
+    const savedConversations = await Storage.get('conversations') || [];
+    const settings = await Storage.get('settings') || {};
+
+    AppState.gpts = savedGPTs;
+    AppState.conversations = savedConversations.map(c => ({ category: 'other', ...c }));
+    AppState.categories = settings.categories || ['writing', 'coding', 'analysis', 'creative', 'business', 'education', 'other'];
+
+    // Initialisation des gestionnaires
+    ThemeManager.init();
+    NavigationManager.init();
+    FormManager.init();
+
+    // Configuration des boutons principaux
+    const syncBtn = document.getElementById('syncBtn');
+    if (syncBtn) {
+      syncBtn.addEventListener('click', async () => {
+        await SyncManager.syncGPTs();
+        await SyncManager.syncConversations();
+        await SyncManager.updateSyncStats();
+        FormManager.updateStats();
+      });
+    }
+
+    // Pas de bouton settings dans le popup, mais le menu peut être géré par extension
+    const settingsBtn = document.getElementById('settingsBtn');
+    if (settingsBtn) {
+      settingsBtn.addEventListener('click', () => {
+        chrome.runtime.openOptionsPage();
+      });
+    }
+
+    // Rendu initial
+    SyncManager.renderGPTs();
+    FormManager.updateStats();
+
+    // Auto-sync au démarrage si l'utilisateur est sur ChatGPT
+    try {
+      const tabs = await chrome.tabs.query({ 
+        active: true, 
+        url: ['*://chat.openai.com/*', '*://chatgpt.com/*'] 
+      });
+      
+      if (tabs.length > 0) {
+        setTimeout(() => {
+          SyncManager.syncGPTs().then(() => {
+            SyncManager.updateSyncStats();
+            FormManager.updateStats();
+          });
+        }, 1000);
+      }
+    } catch (error) {
+      // Gestion silencieuse de l'erreur
+      console.warn('Auto-sync échoué:', error);
     }
   } catch (error) {
-    // Gestion silencieuse de l'erreur
+    console.error('Erreur lors de l\'initialisation:', error);
+    Utils.showToast('Erreur lors de l\'initialisation', 'error');
   }
 });

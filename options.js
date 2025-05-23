@@ -41,6 +41,7 @@ class OptionsManager {
         conversations: result.conversations || [],
         stats: result.stats || {}
       };
+      console.log('Données chargées:', this.data);
     } catch (error) {
       console.error('Erreur lors du chargement des données:', error);
       this.showToast('Erreur lors du chargement des paramètres', 'error');
@@ -98,151 +99,217 @@ class OptionsManager {
   setupSettingsHandlers() {
     // Thème
     const themeSelect = document.getElementById('theme');
-    themeSelect.addEventListener('change', (e) => {
-      this.updateSetting('theme', e.target.value);
-      this.applyTheme(e.target.value);
-    });
+    if (themeSelect) {
+      themeSelect.addEventListener('change', (e) => {
+        this.updateSetting('theme', e.target.value);
+        this.applyTheme(e.target.value);
+      });
+    }
 
     // Langue
     const languageSelect = document.getElementById('language');
-    languageSelect.addEventListener('change', (e) => {
-      this.updateSetting('language', e.target.value);
-      this.applyLanguage(e.target.value);
-    });
+    if (languageSelect) {
+      languageSelect.addEventListener('change', (e) => {
+        this.updateSetting('language', e.target.value);
+        this.applyLanguage(e.target.value);
+      });
+    }
 
     // Notifications
     const notificationsToggle = document.getElementById('notifications');
-    notificationsToggle.addEventListener('change', (e) => {
-      this.updateSetting('notifications', e.target.checked);
-    });
+    if (notificationsToggle) {
+      notificationsToggle.addEventListener('change', (e) => {
+        this.updateSetting('notifications', e.target.checked);
+      });
+    }
 
     const soundNotificationsToggle = document.getElementById('soundNotifications');
-    soundNotificationsToggle.addEventListener('change', (e) => {
-      this.updateSetting('soundNotifications', e.target.checked);
-    });
+    if (soundNotificationsToggle) {
+      soundNotificationsToggle.addEventListener('change', (e) => {
+        this.updateSetting('soundNotifications', e.target.checked);
+      });
+    }
 
     // Synchronisation
     const autoSyncToggle = document.getElementById('autoSync');
-    autoSyncToggle.addEventListener('change', (e) => {
-      this.updateSetting('autoSync', e.target.checked);
-    });
+    if (autoSyncToggle) {
+      autoSyncToggle.addEventListener('change', (e) => {
+        this.updateSetting('autoSync', e.target.checked);
+      });
+    }
 
     const syncIntervalSelect = document.getElementById('syncInterval');
-    syncIntervalSelect.addEventListener('change', (e) => {
-      this.updateSetting('syncInterval', parseInt(e.target.value));
-    });
+    if (syncIntervalSelect) {
+      syncIntervalSelect.addEventListener('change', (e) => {
+        this.updateSetting('syncInterval', parseInt(e.target.value));
+      });
+    }
 
     const syncGPTsToggle = document.getElementById('syncGPTs');
-    syncGPTsToggle.addEventListener('change', (e) => {
-      this.updateSetting('syncGPTs', e.target.checked);
-    });
+    if (syncGPTsToggle) {
+      syncGPTsToggle.addEventListener('change', (e) => {
+        this.updateSetting('syncGPTs', e.target.checked);
+      });
+    }
 
     const syncConversationsToggle = document.getElementById('syncConversations');
-    syncConversationsToggle.addEventListener('change', (e) => {
-      this.updateSetting('syncConversations', e.target.checked);
-    });
+    if (syncConversationsToggle) {
+      syncConversationsToggle.addEventListener('change', (e) => {
+        this.updateSetting('syncConversations', e.target.checked);
+      });
+    }
 
     // Couleurs
     const primaryColorInput = document.getElementById('primaryColor');
-    primaryColorInput.addEventListener('input', (e) => {
-      this.updateSetting('primaryColor', e.target.value);
-      this.applyColors();
-    });
+    if (primaryColorInput) {
+      primaryColorInput.addEventListener('input', (e) => {
+        this.updateSetting('primaryColor', e.target.value);
+        this.applyColors();
+      });
+    }
 
     const backgroundColorInput = document.getElementById('backgroundColor');
-    backgroundColorInput.addEventListener('input', (e) => {
-      this.updateSetting('backgroundColor', e.target.value);
-      this.applyColors();
-    });
+    if (backgroundColorInput) {
+      backgroundColorInput.addEventListener('input', (e) => {
+        this.updateSetting('backgroundColor', e.target.value);
+        this.applyColors();
+      });
+    }
 
     // Raccourcis clavier
-    document.getElementById('configureShortcuts').addEventListener('click', () => {
-      chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
-    });
+    const configureShortcuts = document.getElementById('configureShortcuts');
+    if (configureShortcuts) {
+      configureShortcuts.addEventListener('click', () => {
+        chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
+      });
+    }
 
     // Synchronisation manuelle
-    document.getElementById('syncNow').addEventListener('click', () => {
-      this.performManualSync();
-    });
+    const syncNow = document.getElementById('syncNow');
+    if (syncNow) {
+      syncNow.addEventListener('click', () => {
+        this.performManualSync();
+      });
+    }
 
     // Reset sync
-    document.getElementById('resetSync').addEventListener('click', () => {
-      this.resetSyncData();
-    });
+    const resetSync = document.getElementById('resetSync');
+    if (resetSync) {
+      resetSync.addEventListener('click', () => {
+        this.resetSyncData();
+      });
+    }
   }
 
   setupDataHandlers() {
     // Export
-    document.getElementById('exportData').addEventListener('click', () => {
-      this.exportAllData();
-    });
+    const exportBtn = document.getElementById('exportData');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', () => {
+        this.exportAllData();
+      });
+    }
 
     // Import
-    document.getElementById('importData').addEventListener('click', () => {
-      this.importData();
-    });
+    const importBtn = document.getElementById('importData');
+    if (importBtn) {
+      importBtn.addEventListener('click', () => {
+        this.importData();
+      });
+    }
 
     // Nettoyage
-    document.getElementById('cleanDuplicates').addEventListener('click', () => {
-      this.cleanDuplicates();
-    });
+    const cleanDuplicates = document.getElementById('cleanDuplicates');
+    if (cleanDuplicates) {
+      cleanDuplicates.addEventListener('click', () => {
+        this.cleanDuplicates();
+      });
+    }
 
-    document.getElementById('clearOldData').addEventListener('click', () => {
-      this.clearOldData();
-    });
+    const clearOldData = document.getElementById('clearOldData');
+    if (clearOldData) {
+      clearOldData.addEventListener('click', () => {
+        this.clearOldData();
+      });
+    }
 
-    document.getElementById('resetAllData').addEventListener('click', () => {
-      this.resetAllData();
-    });
+    const resetAllData = document.getElementById('resetAllData');
+    if (resetAllData) {
+      resetAllData.addEventListener('click', () => {
+        this.resetAllData();
+      });
+    }
   }
 
   setupCategoriesManager() {
     const addCategoryBtn = document.getElementById('addCategory');
     const newCategoryInput = document.getElementById('newCategoryName');
 
-    addCategoryBtn.addEventListener('click', () => {
-      const categoryName = newCategoryInput.value.trim();
-      if (categoryName) {
-        this.addCategory(categoryName);
-        newCategoryInput.value = '';
-      }
-    });
+    if (addCategoryBtn && newCategoryInput) {
+      addCategoryBtn.addEventListener('click', () => {
+        const categoryName = newCategoryInput.value.trim();
+        if (categoryName) {
+          this.addCategory(categoryName);
+          newCategoryInput.value = '';
+        }
+      });
 
-    newCategoryInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        addCategoryBtn.click();
-      }
-    });
+      newCategoryInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          addCategoryBtn.click();
+        }
+      });
+    }
   }
 
   async updateSetting(key, value) {
     this.settings[key] = value;
     await chrome.storage.local.set({ settings: this.settings });
-    if (key === 'theme') {
-      await chrome.storage.local.set({ theme: value });
-    }
-
+    
     // Notification du background script si nécessaire
     if (['autoSync', 'syncInterval', 'notifications'].includes(key)) {
-      chrome.runtime.sendMessage({
-        action: 'updateSettings',
-        settings: this.settings
-      });
+      try {
+        await chrome.runtime.sendMessage({
+          action: 'updateSettings',
+          settings: this.settings
+        });
+      } catch (error) {
+        console.warn('Impossible de notifier le background script:', error);
+      }
     }
   }
 
   loadSettings() {
     // Chargement des valeurs dans l'interface
-    document.getElementById('theme').value = this.settings.theme || 'light';
-    document.getElementById('language').value = this.settings.language || 'fr';
-    document.getElementById('notifications').checked = this.settings.notifications !== false;
-    document.getElementById('soundNotifications').checked = this.settings.soundNotifications || false;
-    document.getElementById('autoSync').checked = this.settings.autoSync !== false;
-    document.getElementById('syncInterval').value = this.settings.syncInterval || 5;
-    document.getElementById('syncGPTs').checked = this.settings.syncGPTs !== false;
-    document.getElementById('syncConversations').checked = this.settings.syncConversations !== false;
-    document.getElementById('primaryColor').value = this.settings.primaryColor || '#10a37f';
-    document.getElementById('backgroundColor').value = this.settings.backgroundColor || '#ffffff';
+    const theme = document.getElementById('theme');
+    if (theme) theme.value = this.settings.theme || 'light';
+    
+    const language = document.getElementById('language');
+    if (language) language.value = this.settings.language || 'fr';
+    
+    const notifications = document.getElementById('notifications');
+    if (notifications) notifications.checked = this.settings.notifications !== false;
+    
+    const soundNotifications = document.getElementById('soundNotifications');
+    if (soundNotifications) soundNotifications.checked = this.settings.soundNotifications || false;
+    
+    const autoSync = document.getElementById('autoSync');
+    if (autoSync) autoSync.checked = this.settings.autoSync !== false;
+    
+    const syncInterval = document.getElementById('syncInterval');
+    if (syncInterval) syncInterval.value = this.settings.syncInterval || 5;
+    
+    const syncGPTs = document.getElementById('syncGPTs');
+    if (syncGPTs) syncGPTs.checked = this.settings.syncGPTs !== false;
+    
+    const syncConversations = document.getElementById('syncConversations');
+    if (syncConversations) syncConversations.checked = this.settings.syncConversations !== false;
+    
+    const primaryColor = document.getElementById('primaryColor');
+    if (primaryColor) primaryColor.value = this.settings.primaryColor || '#10a37f';
+    
+    const backgroundColor = document.getElementById('backgroundColor');
+    if (backgroundColor) backgroundColor.value = this.settings.backgroundColor || '#ffffff';
 
     // Application du thème
     this.applyTheme(this.settings.theme || 'light');
@@ -281,9 +348,17 @@ class OptionsManager {
 
     const t = texts[lang] || texts.fr;
     const navGen = document.getElementById('navGeneral');
-    if (navGen) navGen.childNodes[2].nodeValue = t.general;
+    if (navGen && navGen.childNodes.length > 2) {
+      navGen.childNodes[2].nodeValue = t.general;
+    }
+    
     const syncBtn = document.getElementById('syncNow');
-    if (syncBtn) syncBtn.childNodes[syncBtn.childNodes.length-1].nodeValue = t.syncNow;
+    if (syncBtn && syncBtn.childNodes.length > 0) {
+      const textNode = Array.from(syncBtn.childNodes).find(node => node.nodeType === 3);
+      if (textNode) {
+        textNode.nodeValue = t.syncNow;
+      }
+    }
   }
 
   async updateSyncStatus(syncing = false) {
@@ -293,23 +368,30 @@ class OptionsManager {
     const statusElement = document.getElementById('syncStatus');
 
     if (syncing) {
-      statusElement.textContent = 'En cours...';
-      statusElement.className = 'status-value status-active';
+      if (statusElement) {
+        statusElement.textContent = 'En cours...';
+        statusElement.className = 'status-value status-active';
+      }
     } else if (lastSync) {
       const date = new Date(lastSync);
-      lastSyncElement.textContent = this.formatDate(date);
-      statusElement.textContent = 'Actif';
-      statusElement.className = 'status-value status-active';
+      if (lastSyncElement) lastSyncElement.textContent = this.formatDate(date);
+      if (statusElement) {
+        statusElement.textContent = 'Actif';
+        statusElement.className = 'status-value status-active';
+      }
     } else {
-      lastSyncElement.textContent = 'Jamais';
-      statusElement.textContent = 'Inactif';
-      statusElement.className = 'status-value status-inactive';
+      if (lastSyncElement) lastSyncElement.textContent = 'Jamais';
+      if (statusElement) {
+        statusElement.textContent = 'Inactif';
+        statusElement.className = 'status-value status-inactive';
+      }
     }
   }
 
-
   async performManualSync() {
     const syncBtn = document.getElementById('syncNow');
+    if (!syncBtn) return;
+
     const originalText = syncBtn.innerHTML;
 
     this.updateSyncStatus(true);
@@ -322,51 +404,95 @@ class OptionsManager {
     syncBtn.disabled = true;
 
     try {
+      // Chercher les onglets ChatGPT
       const tabs = await chrome.tabs.query({
         url: ['*://chat.openai.com/*', '*://chatgpt.com/*']
       });
+      
       if (tabs.length === 0) {
-        throw new Error('Aucun onglet ChatGPT ouvert');
+        throw new Error('Aucun onglet ChatGPT ouvert. Veuillez ouvrir ChatGPT dans un onglet.');
       }
 
+      console.log('Onglet ChatGPT trouvé:', tabs[0]);
+
+      // Injection du content script
       await chrome.scripting.executeScript({
         target: { tabId: tabs[0].id },
         files: ['content.js']
       });
 
-      const gptRes = await chrome.tabs.sendMessage(tabs[0].id, { action: 'syncGPTs' });
-      const convRes = await chrome.tabs.sendMessage(tabs[0].id, { action: 'syncConversations' });
-      if (gptRes && gptRes.success && convRes && convRes.success) {
-        await this.loadData();
-        const stats = await chrome.storage.local.get('stats');
-        const newStats = {
-          ...(stats.stats || {}),
-          totalSyncs: (stats.stats?.totalSyncs || 0) + 1,
-          totalGPTs: this.data.gpts.length,
-          totalConversations: this.data.conversations.length,
-          lastSyncTime: Date.now()
-        };
-        await chrome.storage.local.set({ stats: newStats });
-        this.data.stats = newStats;
-        this.updateDataSummary();
-        this.updateSyncStatus();
-        this.updateStats();
-        this.renderGptList();
-        this.renderConvList();
-        this.loadCategories();
-        this.showToast(`${gptRes.gpts?.length || 0} GPTs et ${convRes.conversations?.length || 0} conversations synchronisés`, 'success');
-      } else {
-        throw new Error('Échec de la synchronisation');
+      console.log('Content script injecté');
+
+      // Synchronisation des GPTs
+      let gptRes = null;
+      if (this.settings.syncGPTs) {
+        try {
+          gptRes = await chrome.tabs.sendMessage(tabs[0].id, { action: 'syncGPTs' });
+          console.log('Réponse GPTs:', gptRes);
+        } catch (error) {
+          console.error('Erreur sync GPTs:', error);
+        }
       }
+
+      // Synchronisation des conversations
+      let convRes = null;
+      if (this.settings.syncConversations) {
+        try {
+          convRes = await chrome.tabs.sendMessage(tabs[0].id, { action: 'syncConversations' });
+          console.log('Réponse conversations:', convRes);
+        } catch (error) {
+          console.error('Erreur sync conversations:', error);
+        }
+      }
+
+      // Traitement des résultats
+      let totalGPTs = 0;
+      let totalConversations = 0;
+
+      if (gptRes && gptRes.success && gptRes.gpts) {
+        await chrome.storage.local.set({ gpts: gptRes.gpts });
+        this.data.gpts = gptRes.gpts;
+        totalGPTs = gptRes.gpts.length;
+      }
+
+      if (convRes && convRes.success && convRes.conversations) {
+        await chrome.storage.local.set({ conversations: convRes.conversations });
+        this.data.conversations = convRes.conversations;
+        totalConversations = convRes.conversations.length;
+      }
+
+      // Mise à jour des statistiques
+      const stats = await chrome.storage.local.get('stats');
+      const newStats = {
+        ...(stats.stats || {}),
+        totalSyncs: (stats.stats?.totalSyncs || 0) + 1,
+        totalGPTs: totalGPTs,
+        totalConversations: totalConversations,
+        lastSyncTime: Date.now()
+      };
+      await chrome.storage.local.set({ stats: newStats });
+      this.data.stats = newStats;
+
+      // Mise à jour de l'interface
+      this.updateDataSummary();
+      this.updateSyncStatus();
+      this.updateStats();
+      this.renderGptList();
+      this.renderConvList();
+      this.loadCategories();
+
+      this.showToast(`${totalGPTs} GPTs et ${totalConversations} conversations synchronisés`, 'success');
+
     } catch (error) {
       console.error('Erreur sync manuel:', error);
-      this.showToast(error.message, 'error');
+      this.showToast(error.message || 'Échec de la synchronisation', 'error');
     } finally {
       syncBtn.innerHTML = originalText;
       syncBtn.disabled = false;
       this.updateSyncStatus();
     }
   }
+
   async resetSyncData() {
     if (confirm('Êtes-vous sûr de vouloir réinitialiser les données de synchronisation ?')) {
       await chrome.storage.local.remove(['lastAutoSync', 'lastSyncTime']);
@@ -376,31 +502,48 @@ class OptionsManager {
   }
 
   updateDataSummary() {
-    document.getElementById('totalGPTs').textContent = this.data.gpts.length;
-    document.getElementById('totalConversations').textContent = this.data.conversations.length;
-    document.getElementById('totalCategories').textContent = this.settings.categories.length;
+    const totalGPTs = document.getElementById('totalGPTs');
+    if (totalGPTs) totalGPTs.textContent = this.data.gpts.length;
+    
+    const totalConversations = document.getElementById('totalConversations');
+    if (totalConversations) totalConversations.textContent = this.data.conversations.length;
+    
+    const totalCategories = document.getElementById('totalCategories');
+    if (totalCategories) totalCategories.textContent = this.settings.categories.length;
     
     // Calcul de la taille approximative des données
     const dataStr = JSON.stringify(this.data);
     const sizeKB = Math.round(new Blob([dataStr]).size / 1024);
-    document.getElementById('dataSize').textContent = `${sizeKB} KB`;
+    const dataSize = document.getElementById('dataSize');
+    if (dataSize) dataSize.textContent = `${sizeKB} KB`;
   }
 
   async updateStats() {
     const stats = this.data.stats || {};
     
-    document.getElementById('totalSyncs').textContent = stats.totalSyncs || 0;
-    document.getElementById('avgSyncTime').textContent = `${stats.avgSyncTime || 0}s`;
-    document.getElementById('favoriteGPTs').textContent = 
-      this.data.gpts.filter(gpt => gpt.favorite).length;
-    document.getElementById('activeConversations').textContent = 
-      this.data.conversations.filter(conv => 
+    const totalSyncs = document.getElementById('totalSyncs');
+    if (totalSyncs) totalSyncs.textContent = stats.totalSyncs || 0;
+    
+    const avgSyncTime = document.getElementById('avgSyncTime');
+    if (avgSyncTime) avgSyncTime.textContent = `${stats.avgSyncTime || 0}s`;
+    
+    const favoriteGPTs = document.getElementById('favoriteGPTs');
+    if (favoriteGPTs) {
+      favoriteGPTs.textContent = this.data.gpts.filter(gpt => gpt.favorite).length;
+    }
+    
+    const activeConversations = document.getElementById('activeConversations');
+    if (activeConversations) {
+      activeConversations.textContent = this.data.conversations.filter(conv => 
         new Date(conv.updatedAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
       ).length;
+    }
   }
 
   loadCategories() {
     const categoriesList = document.getElementById('categoriesList');
+    if (!categoriesList) return;
+    
     const categories = this.settings.categories || [];
     
     categoriesList.innerHTML = categories.map(category => {
@@ -695,6 +838,8 @@ class OptionsManager {
 
   renderChart() {
     const canvas = document.getElementById('categoryChart');
+    if (!canvas) return;
+    
     const ctx = canvas.getContext('2d');
     
     // Données du graphique
@@ -767,13 +912,20 @@ class OptionsManager {
 
   updateVersion() {
     const version = chrome.runtime.getManifest().version;
-    document.getElementById('version').textContent = version;
-    document.getElementById('aboutVersion').textContent = version;
-    document.getElementById('lastUpdate').textContent = new Date().getFullYear();
+    const versionEl = document.getElementById('version');
+    if (versionEl) versionEl.textContent = version;
+    
+    const aboutVersionEl = document.getElementById('aboutVersion');
+    if (aboutVersionEl) aboutVersionEl.textContent = version;
+    
+    const lastUpdateEl = document.getElementById('lastUpdate');
+    if (lastUpdateEl) lastUpdateEl.textContent = new Date().getFullYear();
   }
 
   showToast(message, type = 'success') {
     const container = document.getElementById('toastContainer');
+    if (!container) return;
+    
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     toast.textContent = message;
@@ -781,7 +933,9 @@ class OptionsManager {
     container.appendChild(toast);
     
     setTimeout(() => {
-      toast.remove();
+      if (toast.parentNode) {
+        toast.remove();
+      }
     }, 4000);
   }
 
@@ -808,8 +962,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Gestion du thème automatique
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-  const currentTheme = document.getElementById('theme').value;
-  if (currentTheme === 'auto') {
+  const themeEl = document.getElementById('theme');
+  if (themeEl && themeEl.value === 'auto') {
     document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
   }
 });
