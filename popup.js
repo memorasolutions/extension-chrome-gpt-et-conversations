@@ -432,7 +432,7 @@ const SyncManager = {
     // Ouverture des GPTs
     document.querySelectorAll('.item-card').forEach(card => {
       card.addEventListener('click', async (e) => {
-        if (e.target.closest('.item-btn')) return;
+        if (e.target.closest('.item-btn') || e.target.closest('select')) return;
         
         const gptId = card.dataset.id;
         const gpt = AppState.gpts.find(g => g.id === gptId);

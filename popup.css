@@ -670,7 +670,7 @@ body {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  background: var(--surface);
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 12px 16px;
@@ -681,12 +681,12 @@ body {
 
 .toast.success {
   border-color: var(--primary-color);
-  background: rgba(16, 163, 127, 0.1);
+  background: #ffffff;
 }
 
 .toast.error {
   border-color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
+  background: #ffffff;
 }
 
 @keyframes slideInRight {
