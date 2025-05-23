@@ -373,6 +373,11 @@ class ChatGPTScraper {
       .substring(0, 200);
   }
 
+  filterFallbackName(text) {
+    if (!text) return '';
+    return this.isValidGPTName(text) ? text : '';
+  }
+
   categorizeGPT(name, description) {
     const text = (name + ' ' + description).toLowerCase();
     
