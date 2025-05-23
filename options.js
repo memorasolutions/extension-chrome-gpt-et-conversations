@@ -337,28 +337,43 @@ class OptionsManager {
   applyLanguage(lang) {
     const texts = {
       fr: {
-        general: 'Général',
+        navGeneral: 'Général',
+        navSync: 'Synchronisation',
+        navCategories: 'Catégories',
+        navCustom: 'Personnalisation',
+        navData: 'Données',
+        navGpts: 'GPTs',
+        navConvs: 'Conversations',
+        navStats: 'Statistiques',
+        navAbout: 'À propos',
         syncNow: 'Synchroniser maintenant'
       },
       en: {
-        general: 'General',
+        navGeneral: 'General',
+        navSync: 'Sync',
+        navCategories: 'Categories',
+        navCustom: 'Custom',
+        navData: 'Data',
+        navGpts: 'GPTs',
+        navConvs: 'Conversations',
+        navStats: 'Stats',
+        navAbout: 'About',
         syncNow: 'Sync now'
       }
     };
 
     const t = texts[lang] || texts.fr;
-    const navGen = document.getElementById('navGeneral');
-    if (navGen && navGen.childNodes.length > 2) {
-      navGen.childNodes[2].nodeValue = t.general;
-    }
-    
-    const syncBtn = document.getElementById('syncNow');
-    if (syncBtn && syncBtn.childNodes.length > 0) {
-      const textNode = Array.from(syncBtn.childNodes).find(node => node.nodeType === 3);
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      const val = t[key];
+      if (!val) return;
+      const textNode = Array.from(el.childNodes).find(n => n.nodeType === Node.TEXT_NODE && n.nodeValue.trim());
       if (textNode) {
-        textNode.nodeValue = t.syncNow;
+        textNode.nodeValue = val;
+      } else {
+        el.textContent = val;
       }
-    }
+    });
   }
 
   async updateSyncStatus(syncing = false) {

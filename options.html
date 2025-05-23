@@ -31,56 +31,56 @@
         <!-- Navigation -->
         <nav class="nav-sidebar">
             <ul class="nav-list">
-                <li><a href="#general" class="nav-link active" data-section="general" id="navGeneral">
+                <li><a href="#general" class="nav-link active" data-section="general" id="navGeneral" data-i18n="navGeneral">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-4H9v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9z" stroke="currentColor" stroke-width="2"/>
                     </svg>
                     Général
                 </a></li>
-                <li><a href="#sync" class="nav-link" data-section="sync">
+                <li><a href="#sync" class="nav-link" data-section="sync" id="navSync" data-i18n="navSync">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <path d="M23 4V10H17M1 20V14H7M20.49 9A9 9 0 0 0 5.64 5.64L1 10M22.99 14A9 9 0 0 1 8.36 18.36L13 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     Synchronisation
                 </a></li>
-                <li><a href="#categories" class="nav-link" data-section="categories">
+                <li><a href="#categories" class="nav-link" data-section="categories" id="navCategories" data-i18n="navCategories">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <path d="M4 4H20V6H4V4ZM4 8H20V10H4V8ZM4 12H20V14H4V12ZM4 16H20V18H4V16Z" fill="currentColor"/>
                     </svg>
                     Catégories
                 </a></li>
-                <li><a href="#custom" class="nav-link" data-section="custom">
+                <li><a href="#custom" class="nav-link" data-section="custom" id="navCustom" data-i18n="navCustom">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     Personnalisation
                 </a></li>
-                <li><a href="#data" class="nav-link" data-section="data">
+                <li><a href="#data" class="nav-link" data-section="data" id="navData" data-i18n="navData">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         <polyline points="14,2 14,8 20,8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     Données
                 </a></li>
-                <li><a href="#gpts" class="nav-link" data-section="gpts">
+                <li><a href="#gpts" class="nav-link" data-section="gpts" id="navGpts" data-i18n="navGpts">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <path d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     GPTs
                 </a></li>
-                <li><a href="#convs" class="nav-link" data-section="convs">
+                <li><a href="#convs" class="nav-link" data-section="convs" id="navConvs" data-i18n="navConvs">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <path d="M21 15A2 2 0 0 1 19 17H7L4 20V5A2 2 0 0 1 6 3H19A2 2 0 0 1 21 5V15Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     Conversations
                 </a></li>
-                <li><a href="#stats" class="nav-link" data-section="stats">
+                <li><a href="#stats" class="nav-link" data-section="stats" id="navStats" data-i18n="navStats">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <path d="M3 3V21H21M7 14L12 9L16 13L21 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
                     Statistiques
                 </a></li>
-                <li><a href="#about" class="nav-link" data-section="about">
+                <li><a href="#about" class="nav-link" data-section="about" id="navAbout" data-i18n="navAbout">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                         <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
                         <path d="M9,9h0a3,3,0,0,1,6,0c0,2-3,3-3,3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -227,7 +227,7 @@
                 <div class="settings-group">
                     <h3>Actions de synchronisation</h3>
                     <div class="action-buttons">
-                        <button id="syncNow" class="btn-primary">
+                        <button id="syncNow" class="btn-primary" data-i18n="syncNow">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                 <path d="M23 4V10H17M1 20V14H7M20.49 9A9 9 0 0 0 5.64 5.64L1 10M22.99 14A9 9 0 0 1 8.36 18.36L13 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
