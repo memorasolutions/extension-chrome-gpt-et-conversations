@@ -1,5 +1,13 @@
 // Options Page Script pour ChatGPT Sync Manager
 
+function escapeHTML(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 class OptionsManager {
   constructor() {
     this.currentSection = 'general';
@@ -468,12 +476,18 @@ class OptionsManager {
         await chrome.storage.local.set({ gpts: gptRes.gpts });
         this.data.gpts = gptRes.gpts;
         totalGPTs = gptRes.gpts.length;
+      } else {
+        console.warn('Aucune donnée GPT reçue');
+        this.showToast('Aucune donnée GPT reçue', 'warning');
       }
 
       if (convRes && convRes.success && convRes.conversations) {
         await chrome.storage.local.set({ conversations: convRes.conversations });
         this.data.conversations = convRes.conversations;
         totalConversations = convRes.conversations.length;
+      } else {
+        console.warn('Aucune donnée conversation reçue');
+        this.showToast('Aucune conversation reçue', 'warning');
       }
 
       // Mise à jour des statistiques
@@ -912,16 +926,24 @@ class OptionsManager {
   renderGptList() {
     const container = document.getElementById('optionsGptList');
     if (!container) return;
+    if (!this.data.gpts.length) {
+      container.innerHTML = `<div class="placeholder">Aucun GPT disponible</div>`;
+      return;
+    }
     container.innerHTML = this.data.gpts.map(gpt => `
-      <div class="item-row"><img src="${gpt.iconUrl || 'icons/icon16.png'}" alt="">${gpt.name}</div>
+      <div class="item-row"><img src="${gpt.iconUrl || 'icons/icon16.png'}" alt="">${escapeHTML(gpt.name)}</div>
     `).join('');
   }
 
   renderConvList() {
     const container = document.getElementById('optionsConvList');
     if (!container) return;
+    if (!this.data.conversations.length) {
+      container.innerHTML = `<div class="placeholder">Aucune conversation</div>`;
+      return;
+    }
     container.innerHTML = this.data.conversations.map(conv => `
-      <div class="item-row"><img src="icons/icon16.png" alt="">${conv.title}</div>
+      <div class="item-row"><img src="icons/icon16.png" alt="">${escapeHTML(conv.title)}</div>
     `).join('');
   }
 

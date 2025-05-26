@@ -52,6 +52,15 @@ const Utils = {
     return str.charAt(0).toUpperCase() + str.slice(1);
   },
 
+  // Échappe les caractères HTML pour éviter l'injection
+  escapeHTML(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  },
+
   // Affichage des notifications toast
   showToast(message, type = 'success') {
     const toast = document.createElement('div');
@@ -282,7 +291,7 @@ const SyncManager = {
         <div class="item-header">
           <div class="item-title">
             <img class="item-icon" src="${gpt.iconUrl || 'icons/icon16.png'}" alt="">
-            ${gpt.name}
+            ${Utils.escapeHTML(gpt.name)}
           </div>
           <div class="item-actions">
             <button class="item-btn favorite-btn ${gpt.favorite ? 'active' : ''}" title="Marquer comme favori" data-action="favorite">
@@ -311,7 +320,7 @@ const SyncManager = {
             </button>
           </div>
         </div>
-        <div class="item-description">${gpt.description}</div>
+        <div class="item-description">${Utils.escapeHTML(gpt.description)}</div>
         <div class="item-footer">
           <div class="item-meta">
             <span class="category-badge">${gpt.category}</span>
@@ -354,7 +363,7 @@ const SyncManager = {
         <div class="item-header">
           <div class="item-title" data-action="rename-title">
             <img class="item-icon" src="icons/icon16.png" alt="">
-            ${conv.title}
+            ${Utils.escapeHTML(conv.title)}
           </div>
           <div class="item-actions">
             <button class="item-btn star-btn ${conv.starred ? 'active' : ''}" title="Marquer avec une étoile" data-action="star">
@@ -377,7 +386,7 @@ const SyncManager = {
             </button>
           </div>
         </div>
-        <div class="item-description">${conv.lastMessage}</div>
+        <div class="item-description">${Utils.escapeHTML(conv.lastMessage)}</div>
         <div class="item-footer">
           <div class="item-meta">
             <span>${conv.messageCount} messages</span>
