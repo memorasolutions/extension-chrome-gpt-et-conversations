@@ -908,3 +908,11 @@ input[type="color"].setting-input {
   height: 16px;
   margin-right: 8px;
 }
+
+/* Message lorsqu'aucune donnée n'est disponible */
+.placeholder {
+  padding: 20px 0;
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+}
